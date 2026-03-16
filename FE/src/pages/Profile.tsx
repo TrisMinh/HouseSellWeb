@@ -1,14 +1,16 @@
-import { useState, useCallback, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Link, useSearchParams, useNavigate } from "react-router-dom";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
-  Mail, Phone, MapPin, Edit, Star, Clock, CheckCircle2, Save,
-  Eye, EyeOff, Users, TrendingUp, Home, Calendar, ArrowRight, X,
-  Building2, BadgeDollarSign, ShoppingCart, ChevronLeft, ChevronRight
+  Mail, Phone, MapPin, Edit, Clock, CheckCircle2, Save,
+  Eye, EyeOff, TrendingUp, Home, Calendar, ArrowRight, X,
+  Building2, BadgeDollarSign, ShoppingCart, ChevronLeft, ChevronRight, Loader2
 } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
+import { updateProfile } from "@/lib/authApi";
 import { Line } from "react-chartjs-2";
 import {
   Chart as ChartJS,
@@ -27,18 +29,8 @@ ChartJS.register(
   Title, Tooltip, Legend, Filler
 );
 
-const USER_INFO = {
-  name: "Nguyễn Văn A",
-  role: "Individual Investor",
-  joinDate: "Tháng 8, 2025",
-  phone: "+84 901 234 567",
-  email: "nguyenvana@example.com",
-  location: "Quận 7, TP. Hồ Chí Minh",
-  avatar: "../src/assets/images/avatar1.jpg",
-  cover: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&q=80&w=1600",
-  bio: "Nhà đầu tư bất động sản với hơn 5 năm kinh nghiệm trong lĩnh vực căn hộ cao cấp và biệt thự ven sông. Chuyên tư vấn đầu tư khu vực phía Đông TP.HCM.",
-  stats: { totalValue: "128 Billion", properties: 5, appointments: 12 },
-};
+// Dummy stats (sẽ được thay bằng API riêng sau)
+const PLACEHOLDER_STATS = { totalValue: "—", properties: 0, appointments: 0 };
 
 const SELL_LIST = Array.from({ length: 24 }, (_, i) => ({
   id: i + 1, 
@@ -128,6 +120,7 @@ const CHART_DATA = {
 const Profile = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
+  const { user, loading: authLoading, refreshUser } = useAuth();
   const initialTab = (searchParams.get('tab') as TabKey) || "profile";
   const [activeTab, setActiveTab] = useState<TabKey>(initialTab);
   
@@ -144,19 +137,69 @@ const Profile = () => {
 
   const [editingInfo, setEditingInfo] = useState(false);
   const [editingBio, setEditingBio] = useState(false);
+  const [savingInfo, setSavingInfo] = useState(false);
+  const [savingBio, setSavingBio] = useState(false);
   const [activityVisible, setActivityVisible] = useState(true);
+
+  // Lấy giá trị từ user thực, fallback về empty string
   const [infoData, setInfoData] = useState({
-    email: USER_INFO.email,
-    phone: USER_INFO.phone,
-    location: USER_INFO.location,
+    email: user?.email ?? '',
+    phone: user?.phone ?? '',
+    location: user?.address ?? '',
   });
   const [bioData, setBioData] = useState({
-    bio: USER_INFO.bio,
-    name: USER_INFO.name,
-    role: USER_INFO.role,
-    location: USER_INFO.location,
-    joinDate: USER_INFO.joinDate,
+    bio: user?.bio ?? '',
+    firstName: user?.first_name ?? '',
+    lastName: user?.last_name ?? '',
   });
+
+  // Sync khi user load xong
+  useEffect(() => {
+    if (user) {
+      setInfoData({ email: user.email, phone: user.phone ?? '', location: user.address ?? '' });
+      setBioData({ bio: user.bio ?? '', firstName: user.first_name, lastName: user.last_name });
+    }
+  }, [user]);
+
+  const handleSaveInfo = async () => {
+    setSavingInfo(true);
+    try {
+      await updateProfile({ phone: infoData.phone, address: infoData.location });
+      await refreshUser();
+      setEditingInfo(false);
+    } catch {
+      // TODO: show error toast
+    } finally {
+      setSavingInfo(false);
+    }
+  };
+
+  const handleSaveBio = async () => {
+    setSavingBio(true);
+    try {
+      await updateProfile({
+        first_name: bioData.firstName,
+        last_name: bioData.lastName,
+        bio: bioData.bio,
+      });
+      await refreshUser();
+      setEditingBio(false);
+    } catch {
+      // TODO: show error toast
+    } finally {
+      setSavingBio(false);
+    }
+  };
+
+  const displayName = user ? `${user.first_name} ${user.last_name}`.trim() || user.username : '—';
+
+  if (authLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-[#F8FAFB]">
+        <Loader2 className="w-8 h-8 animate-spin text-teal-600" />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[#F8FAFB] font-['Josefin_Sans']">
@@ -170,8 +213,10 @@ const Profile = () => {
             <div className="flex flex-col md:flex-row md:items-end gap-5">
               <div className="relative z-10 group w-fit">
                 <Avatar className="w-32 h-32 border-4 border-white shadow-xl bg-white">
-                  <AvatarImage src={USER_INFO.avatar} className="object-cover" />
-                  <AvatarFallback className="text-3xl bg-teal-50 text-teal-700">NV</AvatarFallback>
+                  <AvatarImage src={user?.avatar ?? undefined} className="object-cover" />
+                  <AvatarFallback className="text-3xl bg-teal-50 text-teal-700">
+                    {displayName.slice(0, 2).toUpperCase() || 'U'}
+                  </AvatarFallback>
                 </Avatar>
                 <button className="absolute bottom-3 right-3 bg-white p-1.5 rounded-full shadow border border-gray-200 cursor-pointer hover:scale-110 transition-transform">
                   <Edit className="w-3.5 h-3.5 text-gray-600" />
@@ -179,15 +224,15 @@ const Profile = () => {
               </div>
 
               <div className="flex-1 pb-2">
-                <h1 className="text-2xl md:text-3xl font-bold text-gray-900 font-['Inter']">{USER_INFO.name}</h1>
-                <p className="text-gray-500 text-sm mt-0.5" style={{ paddingLeft: '5px' }}>{USER_INFO.role}</p>
+                <h1 className="text-2xl md:text-3xl font-bold text-gray-900 font-['Inter']">{displayName}</h1>
+                <p className="text-gray-500 text-sm mt-0.5" style={{ paddingLeft: '5px' }}>@{user?.username}</p>
               </div>
 
               <div className="flex gap-8 pb-3">
                 {[
-                  { label: "Total Value", value: USER_INFO.stats.totalValue, icon: <TrendingUp className="w-4 h-4" /> },
-                  { label: "Active Listings", value: USER_INFO.stats.properties, icon: <Building2 className="w-4 h-4" /> },
-                  { label: "Appointments", value: USER_INFO.stats.appointments, icon: <Calendar className="w-4 h-4" /> },
+                  { label: "Total Value", value: PLACEHOLDER_STATS.totalValue, icon: <TrendingUp className="w-4 h-4" /> },
+                  { label: "Active Listings", value: PLACEHOLDER_STATS.properties, icon: <Building2 className="w-4 h-4" /> },
+                  { label: "Appointments", value: PLACEHOLDER_STATS.appointments, icon: <Calendar className="w-4 h-4" /> },
                 ].map((s) => (
                   <div key={s.label} className="text-center">
                     <div className="text-2xl font-bold text-gray-900 font-['Inter']">{s.value}</div>
@@ -230,26 +275,26 @@ const Profile = () => {
                       </button>
                     ) : (
                       <div className="flex gap-1">
-                        <button onClick={() => setEditingInfo(false)} className="p-2 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer" title="Hủy">
+                        <button onClick={() => { setEditingInfo(false); }} className="p-2 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer" title="Hủy">
                           <X className="w-4 h-4 text-gray-400" />
                         </button>
-                        <button onClick={() => setEditingInfo(false)} className="p-2 rounded-lg bg-[#0F766E] hover:bg-[#0F766E]/90 transition-colors cursor-pointer" title="Lưu">
-                          <Save className="w-4 h-4 text-white" />
+                        <button onClick={handleSaveInfo} disabled={savingInfo} className="p-2 rounded-lg bg-[#0F766E] hover:bg-[#0F766E]/90 transition-colors cursor-pointer disabled:opacity-60" title="Lưu">
+                          {savingInfo ? <Loader2 className="w-4 h-4 text-white animate-spin" /> : <Save className="w-4 h-4 text-white" />}
                         </button>
                       </div>
                     )}
                   </div>
                   <div className="space-y-4">
                     {[
-                      { icon: <Mail className="w-4 h-4 text-[#0F766E]" />, label: "EMAIL", key: "email" as const },
-                      { icon: <Phone className="w-4 h-4 text-[#0F766E]" />, label: "PHONE", key: "phone" as const },
-                      { icon: <MapPin className="w-4 h-4 text-[#0F766E]" />, label: "LOCATION", key: "location" as const },
+                      { icon: <Mail className="w-4 h-4 text-[#0F766E]" />, label: "EMAIL", key: "email" as const, editable: false },
+                      { icon: <Phone className="w-4 h-4 text-[#0F766E]" />, label: "PHONE", key: "phone" as const, editable: true },
+                      { icon: <MapPin className="w-4 h-4 text-[#0F766E]" />, label: "LOCATION", key: "location" as const, editable: true },
                     ].map((info) => (
                       <div key={info.label} className="flex items-start gap-3">
                         <div className="w-9 h-9 rounded-full bg-[#F0FDFA] flex items-center justify-center flex-shrink-0 mt-0.5">{info.icon}</div>
                         <div className="flex-1">
                           <div className="text-[10px] font-bold uppercase tracking-widest text-gray-400">{info.label}</div>
-                          {editingInfo ? (
+                          {editingInfo && info.editable ? (
                             <input
                               type="text"
                               value={infoData[info.key]}
@@ -257,7 +302,7 @@ const Profile = () => {
                               className="text-sm text-gray-700 font-medium w-full border border-gray-200 rounded-lg px-3 py-1.5 mt-1 outline-none focus:border-[#14B8A6] transition-colors"
                             />
                           ) : (
-                            <div className="text-sm text-gray-700 font-medium">{infoData[info.key]}</div>
+                            <div className="text-sm text-gray-700 font-medium">{infoData[info.key] || <span className="text-gray-400 italic">Chưa cập nhật</span>}</div>
                           )}
                         </div>
                       </div>
@@ -277,8 +322,8 @@ const Profile = () => {
                         <button onClick={() => setEditingBio(false)} className="p-2 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer" title="Hủy">
                           <X className="w-4 h-4 text-gray-400" />
                         </button>
-                        <button onClick={() => setEditingBio(false)} className="p-2 rounded-lg bg-[#0F766E] hover:bg-[#0F766E]/90 transition-colors cursor-pointer" title="Lưu">
-                          <Save className="w-4 h-4 text-white" />
+                        <button onClick={handleSaveBio} disabled={savingBio} className="p-2 rounded-lg bg-[#0F766E] hover:bg-[#0F766E]/90 transition-colors cursor-pointer disabled:opacity-60" title="Lưu">
+                          {savingBio ? <Loader2 className="w-4 h-4 text-white animate-spin" /> : <Save className="w-4 h-4 text-white" />}
                         </button>
                       </div>
                     )}
@@ -292,26 +337,26 @@ const Profile = () => {
                       className="text-sm text-gray-500 leading-relaxed mb-5 w-full border border-gray-200 rounded-lg px-3 py-2 outline-none focus:border-[#14B8A6] transition-colors resize-none"
                     />
                   ) : (
-                    <p className="text-sm text-gray-500 leading-relaxed mb-5">{bioData.bio}</p>
+                    <p className="text-sm text-gray-500 leading-relaxed mb-5">{bioData.bio || <span className="italic text-gray-400">Chưa có giới thiệu.</span>}</p>
                   )}
                   <div className="space-y-3 border-t border-gray-100 pt-4">
                     {[
-                      { label: "Full Name", key: "name" as const },
-                      { label: "Role", key: "role" as const },
-                      { label: "Location", key: "location" as const },
-                      { label: "Joined", key: "joinDate" as const },
+                      { label: "Họ", editKey: "firstName" as const, display: bioData.firstName, editable: true },
+                      { label: "Tên", editKey: "lastName" as const, display: bioData.lastName, editable: true },
+                      { label: "Username", editKey: null, display: user?.username, editable: false },
+                      { label: "Email", editKey: null, display: user?.email, editable: false },
                     ].map((d) => (
                       <div key={d.label} className="flex items-center text-sm">
                         <span className="text-gray-400 w-28 flex-shrink-0">{d.label}:</span>
-                        {editingBio ? (
+                        {editingBio && d.editable && d.editKey ? (
                           <input
                             type="text"
-                            value={bioData[d.key]}
-                            onChange={(e) => setBioData({ ...bioData, [d.key]: e.target.value })}
+                            value={bioData[d.editKey]}
+                            onChange={(e) => setBioData({ ...bioData, [d.editKey!]: e.target.value })}
                             className="font-medium text-gray-700 flex-1 border border-gray-200 rounded-lg px-3 py-1 outline-none focus:border-[#14B8A6] transition-colors"
                           />
                         ) : (
-                          <span className="font-medium text-gray-700">{bioData[d.key]}</span>
+                          <span className="font-medium text-gray-700">{d.display || <span className="italic text-gray-400">—</span>}</span>
                         )}
                       </div>
                     ))}
@@ -405,13 +450,9 @@ const Profile = () => {
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {[
-                      { label: "Urgent", title: "Meeting with buyer for Biệt thự ven sông", person: USER_INFO.name, time: "27 Feb, 2:30 PM – 4:00 PM", color: "bg-red-500" },
-                      { label: "Reminder", title: "Update pricing for Penthouse Landmark 81", person: USER_INFO.name, time: "26 Feb, 9:00 AM", color: "bg-blue-500" },
-                      { label: "Completed", title: "Ký hợp đồng nhà phố The Global City", person: USER_INFO.name, time: "24 Feb, 3:00 PM", color: "bg-green-500" },
-                      { label: "Meeting", title: "Xem nhà cùng khách hàng tại Ecopark", person: USER_INFO.name, time: "22 Feb, 10:00 AM", color: "bg-violet-500" },
-                      { label: "Update", title: "Cập nhật hình ảnh cho biệt thự Thảo Điền", person: USER_INFO.name, time: "20 Feb, 11:00 AM", color: "bg-amber-500" },
-                      { label: "Reminder", title: "Liên hệ lại khách hàng Shophouse Sala", person: USER_INFO.name, time: "18 Feb, 2:00 PM", color: "bg-blue-500" },
-                    ].slice(0, 2).map((act, i) => (
+                      { label: "Urgent", title: "Meeting with buyer for Biệt thự ven sông", time: "27 Feb, 2:30 PM – 4:00 PM", color: "bg-red-500" },
+                      { label: "Reminder", title: "Update pricing for Penthouse Landmark 81", time: "26 Feb, 9:00 AM", color: "bg-blue-500" },
+                    ].map((act, i) => (
                       <div key={i} className="border border-gray-100 rounded-xl p-4 hover:border-[#14B8A6]/30 hover:shadow-sm transition-all cursor-pointer group">
                         <div className="flex items-center gap-2 mb-2">
                           <span className={`w-2 h-2 rounded-full ${act.color}`} />
@@ -420,10 +461,10 @@ const Profile = () => {
                         <h4 className="text-sm font-semibold text-gray-800 mb-3 group-hover:text-[#0F766E] transition-colors">{act.title}</h4>
                         <div className="flex items-center gap-2 text-xs text-gray-400">
                           <Avatar className="w-5 h-5">
-                            <AvatarImage src={USER_INFO.avatar} />
-                            <AvatarFallback>NV</AvatarFallback>
+                            <AvatarImage src={user?.avatar ?? undefined} />
+                            <AvatarFallback>{displayName.slice(0,2).toUpperCase()}</AvatarFallback>
                           </Avatar>
-                          {act.person}
+                          {displayName}
                         </div>
                         <div className="flex items-center gap-1 text-xs text-gray-400 mt-1.5">
                           <Clock className="w-3 h-3" /> {act.time}

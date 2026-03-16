@@ -25,7 +25,10 @@ SECRET_KEY = 'django-insecure-7tdjq_xu3j4!f6!r_yw_5el)bb_c8!y@-#6da93*zyvd6ea#9d
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    "localhost",
+    "127.0.0.1",
+]
 
 
 # Application definition
@@ -149,6 +152,8 @@ from datetime import timedelta
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
     "http://127.0.0.1:5173",
+    "http://localhost:8080",
+    "http://127.0.0.1:8080",
 ]
 
 # JWT

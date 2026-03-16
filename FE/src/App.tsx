@@ -3,6 +3,8 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { AuthProvider } from "@/contexts/AuthContext";
+import ProtectedRoute from "@/components/ProtectedRoute";
 import Index from "./pages/Index";
 import Listings from "./pages/Listings";
 import Login from "./pages/Login";
@@ -23,30 +25,36 @@ const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/news" element={<News />} />
-          <Route path="/listings" element={<Listings />} />
-          <Route path="/explore" element={<Explore />} />
-          <Route path="/profile" element={<Profile />} />
-          <Route path="/your-info" element={<ChangePassword />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/privacy" element={<PrivacyPolicy />} />
-          <Route path="/terms" element={<TermsOfService />} />
-          <Route path="/appointment/:id" element={<AppointmentDetail />} />
-          <Route path="/manage-property/:id" element={<ManageProperty />} />
-          <Route path="/add-property" element={<AddProperty />} />
-          <Route path="/property/:id" element={<PropertyDetail />} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
-    </TooltipProvider>
+    <AuthProvider>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <Routes>
+            {/* ── Public routes ── */}
+            <Route path="/" element={<Index />} />
+            <Route path="/news" element={<News />} />
+            <Route path="/listings" element={<Listings />} />
+            <Route path="/explore" element={<Explore />} />
+            <Route path="/property/:id" element={<PropertyDetail />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+            <Route path="/privacy" element={<PrivacyPolicy />} />
+            <Route path="/terms" element={<TermsOfService />} />
+
+            {/* ── Protected routes (cần đăng nhập) ── */}
+            <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+            <Route path="/your-info" element={<ProtectedRoute><ChangePassword /></ProtectedRoute>} />
+            <Route path="/appointment/:id" element={<ProtectedRoute><AppointmentDetail /></ProtectedRoute>} />
+            <Route path="/manage-property/:id" element={<ProtectedRoute><ManageProperty /></ProtectedRoute>} />
+            <Route path="/add-property" element={<ProtectedRoute><AddProperty /></ProtectedRoute>} />
+
+            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </BrowserRouter>
+      </TooltipProvider>
+    </AuthProvider>
   </QueryClientProvider>
 );
 
