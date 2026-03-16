@@ -37,11 +37,19 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'corsheaders',                              # ← THÊM
     'rest_framework',
+    'rest_framework_simplejwt',                 # ← THÊM
+    'rest_framework_simplejwt.token_blacklist', # ← THÊM
     'drf_yasg',
+    'django_filters',                           # ← THÊM
+    'accounts',
+    'properties',
 ]
 
+
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',  # ← THÊM, phải ĐẦU TIÊN
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -50,6 +58,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
 
 
 ROOT_URLCONF = 'core.urls'
@@ -133,3 +142,23 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+from datetime import timedelta
+
+# CORS - Cho phép FE (React) gọi API
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+]
+
+# JWT
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(hours=1),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
+    'ROTATE_REFRESH_TOKENS': True,
+    'BLACKLIST_AFTER_ROTATION': True,
+}
+
+# Media files (ảnh upload)
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
