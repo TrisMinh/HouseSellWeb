@@ -20,6 +20,7 @@ import ManageProperty from "./pages/ManageProperty";
 import AddProperty from "./pages/AddProperty";
 import News from "./pages/News";
 import PropertyDetail from "./pages/PropertyDetail";
+import PricePrediction from "./pages/PricePrediction";
 
 const queryClient = new QueryClient();
 
@@ -34,6 +35,7 @@ const App = () => (
             {/* ── Public routes ── */}
             <Route path="/" element={<Index />} />
             <Route path="/news" element={<News />} />
+            <Route path="/prediction" element={<PricePrediction />} />
             <Route path="/listings" element={<Listings />} />
             <Route path="/explore" element={<Explore />} />
             <Route path="/property/:id" element={<PropertyDetail />} />

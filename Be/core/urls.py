@@ -39,6 +39,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/auth/', include('accounts.urls')),       # Xác thực
     path('api/properties/', include('properties.urls')),  # BĐS
+    path('api/prediction/', include('prediction.urls')),  # Dự đoán giá nhà
 
     # Swagger API Docs
     re_path(r'^swagger(?P<format>\.json|\.yaml)$', schema_view.without_ui(cache_timeout=0), name='schema-json'),

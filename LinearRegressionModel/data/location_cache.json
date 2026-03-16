@@ -1,0 +1,1254 @@
+{
+  "Phường Nghĩa Đô, Quận Cầu Giấy, Hà Nội": {
+    "lat": 21.0418032,
+    "lng": 105.7865134
+  },
+  "Phường Kim Giang, Quận Thanh Xuân, Hà Nội": {
+    "lat": 20.994215,
+    "lng": 105.8193007
+  },
+  "Phường Minh Khai, Quận Hai Bà Trưng, Hà Nội": {
+    "lat": 21.005453,
+    "lng": 105.8606225
+  },
+  "Phường Thụy Khuê, Quận Tây Hồ, Hà Nội": {
+    "lat": 21.0415858,
+    "lng": 105.8215908
+  },
+  "Phường Yên Hoà, Quận Cầu Giấy, Hà Nội": {
+    "lat": 21.0298464,
+    "lng": 105.7913272
+  },
+  "Phường Trung Liệt, Quận Đống Đa, Hà Nội": {
+    "lat": 21.0145101,
+    "lng": 105.8234093
+  },
+  "Phường Đống Mác, Quận Hai Bà Trưng, Hà Nội": {
+    "lat": 21.005453,
+    "lng": 105.8606225
+  },
+  "Phường Xuân La, Quận Tây Hồ, Hà Nội": {
+    "lat": 21.0641291,
+    "lng": 105.8068399
+  },
+  "Phường Văn Quán, Quận Hà Đông, Hà Nội": {
+    "lat": 20.9741659,
+    "lng": 105.7873563
+  },
+  "Thị trấn Văn Điển, Huyện Thanh Trì, Hà Nội": {
+    "lat": 20.9415559,
+    "lng": 105.8360164
+  },
+  "Phường Định Công, Quận Hoàng Mai, Hà Nội": {
+    "lat": 20.975392,
+    "lng": 105.8573399
+  },
+  "Phường Bồ Đề, Quận Long Biên, Hà Nội": {
+    "lat": 21.0364751,
+    "lng": 105.8778886
+  },
+  "Phường Quang Trung, Quận Hà Đông, Hà Nội": {
+    "lat": 20.9721687,
+    "lng": 105.7765642
+  },
+  "Phường Thanh Lương, Quận Hai Bà Trưng, Hà Nội": {
+    "lat": 21.005453,
+    "lng": 105.8606225
+  },
+  "Phường Khương Trung, Quận Thanh Xuân, Hà Nội": {
+    "lat": 20.994215,
+    "lng": 105.8193007
+  },
+  "Phường Phúc Tân, Quận Hoàn Kiếm, Hà Nội": {
+    "lat": 21.03648,
+    "lng": 105.8542595
+  },
+  "Phường Gia Thụy, Quận Long Biên, Hà Nội": {
+    "lat": 21.036727,
+    "lng": 105.898499
+  },
+  "Phường Khương Đình, Quận Thanh Xuân, Hà Nội": {
+    "lat": 20.994215,
+    "lng": 105.8193007
+  },
+  "Phường Phương Canh, Quận Nam Từ Liêm, Hà Nội": {
+    "lat": 21.032865,
+    "lng": 105.7416196
+  },
+  "Phường Tương Mai, Quận Hoàng Mai, Hà Nội": {
+    "lat": 20.975392,
+    "lng": 105.8573399
+  },
+  "Phường La Khê, Quận Hà Đông, Hà Nội": {
+    "lat": 20.9540708,
+    "lng": 105.7600855
+  },
+  "Phường Mễ Trì, Quận Nam Từ Liêm, Hà Nội": {
+    "lat": 21.0185679,
+    "lng": 105.7576128
+  },
+  "Phường Khương Mai, Quận Thanh Xuân, Hà Nội": {
+    "lat": 20.994215,
+    "lng": 105.8193007
+  },
+  "Phường Láng Hạ, Quận Đống Đa, Hà Nội": {
+    "lat": 21.0212424,
+    "lng": 105.8100297
+  },
+  "Phường Quan Hoa, Quận Cầu Giấy, Hà Nội": {
+    "lat": 21.0361576,
+    "lng": 105.8015505
+  },
+  "Phường Tây Mỗ, Quận Nam Từ Liêm, Hà Nội": {
+    "lat": 21.0031898,
+    "lng": 105.7508212
+  },
+  "Phường Ngọc Khánh, Quận Ba Đình, Hà Nội": {
+    "lat": 21.0291095,
+    "lng": 105.8115454
+  },
+  "Phường Đại Mỗ, Quận Nam Từ Liêm, Hà Nội": {
+    "lat": 20.9962479,
+    "lng": 105.7829269
+  },
+  "Xã Tả Thanh Oai, Huyện Thanh Trì, Hà Nội": {
+    "lat": 20.9415559,
+    "lng": 105.8360164
+  },
+  "Phường Mỹ Đình 1, Quận Nam Từ Liêm, Hà Nội": {
+    "lat": 21.0205027,
+    "lng": 105.7639271
+  },
+  "Xã Tam Hiệp, Huyện Thanh Trì, Hà Nội": {
+    "lat": 20.9415559,
+    "lng": 105.8360164
+  },
+  "Phường Cống Vị, Quận Ba Đình, Hà Nội": {
+    "lat": 21.0347091,
+    "lng": 105.8245193
+  },
+  "Phường Bách Khoa, Quận Hai Bà Trưng, Hà Nội": {
+    "lat": 21.005453,
+    "lng": 105.8606225
+  },
+  "Phường Vĩnh Phúc, Quận Ba Đình, Hà Nội": {
+    "lat": 21.0347091,
+    "lng": 105.8245193
+  },
+  "Xã Kim Chung, Huyện Hoài Đức, Hà Nội": {
+    "lat": 21.0228962,
+    "lng": 105.7035484
+  },
+  "Phường Đại Kim, Quận Hoàng Mai, Hà Nội": {
+    "lat": 20.975392,
+    "lng": 105.8573399
+  },
+  "Phường Mai Động, Quận Hoàng Mai, Hà Nội": {
+    "lat": 20.975392,
+    "lng": 105.8573399
+  },
+  "Phường Trung Tự, Quận Đống Đa, Hà Nội": {
+    "lat": 21.0145101,
+    "lng": 105.8234093
+  },
+  "Phường Kiến Hưng, Quận Hà Đông, Hà Nội": {
+    "lat": 20.9540708,
+    "lng": 105.7600855
+  },
+  "Phường Trúc Bạch, Quận Ba Đình, Hà Nội": {
+    "lat": 21.0478774,
+    "lng": 105.8422406
+  },
+  "Phường Cổ Nhuế 1, Quận Bắc Từ Liêm, Hà Nội": {
+    "lat": 21.0451915,
+    "lng": 105.7861662
+  },
+  "Phường Đức Giang, Quận Long Biên, Hà Nội": {
+    "lat": 21.0695094,
+    "lng": 105.9046593
+  },
+  "Phường Mỹ Đình 2, Quận Nam Từ Liêm, Hà Nội": {
+    "lat": 21.0185679,
+    "lng": 105.7576128
+  },
+  "Phường Bưởi, Quận Tây Hồ, Hà Nội": {
+    "lat": 21.0682703,
+    "lng": 105.8239615
+  },
+  "Phường Ô Chợ Dừa, Quận Đống Đa, Hà Nội": {
+    "lat": 21.0145101,
+    "lng": 105.8234093
+  },
+  "Phường Long Biên, Quận Long Biên, Hà Nội": {
+    "lat": 21.0180529,
+    "lng": 105.9016988
+  },
+  "Phường Hoàng Văn Thụ, Quận Hoàng Mai, Hà Nội": {
+    "lat": 20.975392,
+    "lng": 105.8573399
+  },
+  "Phường Mai Dịch, Quận Cầu Giấy, Hà Nội": {
+    "lat": 21.0421414,
+    "lng": 105.781475
+  },
+  "Phường Nhân Chính, Quận Thanh Xuân, Hà Nội": {
+    "lat": 20.994215,
+    "lng": 105.8193007
+  },
+  "Phường Vạn Phúc, Quận Hà Đông, Hà Nội": {
+    "lat": 20.9540708,
+    "lng": 105.7600855
+  },
+  "Phường Ngọc Hà, Quận Ba Đình, Hà Nội": {
+    "lat": 21.0403138,
+    "lng": 105.8219721
+  },
+  "Phường Lĩnh Nam, Quận Hoàng Mai, Hà Nội": {
+    "lat": 20.975392,
+    "lng": 105.8573399
+  },
+  "Phường Xuân Đỉnh, Quận Bắc Từ Liêm, Hà Nội": {
+    "lat": 21.0730119,
+    "lng": 105.7613958
+  },
+  "Phường Phú Đô, Quận Nam Từ Liêm, Hà Nội": {
+    "lat": 21.0185679,
+    "lng": 105.7576128
+  },
+  "Phường Liễu Giai, Quận Ba Đình, Hà Nội": {
+    "lat": 21.0347091,
+    "lng": 105.8245193
+  },
+  "Thị trấn Phùng, Huyện Đan Phượng, Hà Nội": {
+    "lat": 21.119409,
+    "lng": 105.6788843
+  },
+  "Phường Kim Liên, Quận Đống Đa, Hà Nội": {
+    "lat": 21.0145101,
+    "lng": 105.8234093
+  },
+  "Phường Phúc Diễn, Quận Bắc Từ Liêm, Hà Nội": {
+    "lat": 21.0730119,
+    "lng": 105.7613958
+  },
+  "Phường Kim Mã, Quận Ba Đình, Hà Nội": {
+    "lat": 21.0347091,
+    "lng": 105.8245193
+  },
+  "Phường Trung Phụng, Quận Đống Đa, Hà Nội": {
+    "lat": 21.0145101,
+    "lng": 105.8234093
+  },
+  "Phường Tân Mai, Quận Hoàng Mai, Hà Nội": {
+    "lat": 20.975392,
+    "lng": 105.8573399
+  },
+  "Phường Cầu Diễn, Quận Nam Từ Liêm, Hà Nội": {
+    "lat": 21.0185679,
+    "lng": 105.7576128
+  },
+  "Phường Ngã Tư Sở, Quận Đống Đa, Hà Nội": {
+    "lat": 21.0145101,
+    "lng": 105.8234093
+  },
+  "Phường Trung Văn, Quận Nam Từ Liêm, Hà Nội": {
+    "lat": 21.0185679,
+    "lng": 105.7576128
+  },
+  "Phường Thượng Đình, Quận Thanh Xuân, Hà Nội": {
+    "lat": 20.994215,
+    "lng": 105.8193007
+  },
+  "Phường Hoàng Liệt, Quận Hoàng Mai, Hà Nội": {
+    "lat": 20.975392,
+    "lng": 105.8573399
+  },
+  "Phường Minh Khai, Quận Bắc Từ Liêm, Hà Nội": {
+    "lat": 21.0446809,
+    "lng": 105.7417518
+  },
+  "Phường Thịnh Liệt, Quận Hoàng Mai, Hà Nội": {
+    "lat": 20.975392,
+    "lng": 105.8573399
+  },
+  "Phường Quốc Tử Giám, Quận Đống Đa, Hà Nội": {
+    "lat": 21.0281354,
+    "lng": 105.838589
+  },
+  "Phường Khâm Thiên, Quận Đống Đa, Hà Nội": {
+    "lat": 21.0145101,
+    "lng": 105.8234093
+  },
+  "Phường Trương Định, Quận Hai Bà Trưng, Hà Nội": {
+    "lat": 21.005453,
+    "lng": 105.8606225
+  },
+  "Phường Phú Diễn, Quận Bắc Từ Liêm, Hà Nội": {
+    "lat": 21.0563409,
+    "lng": 105.7470725
+  },
+  "Phường Thạch Bàn, Quận Long Biên, Hà Nội": {
+    "lat": 21.0180529,
+    "lng": 105.9016988
+  },
+  "Phường Ngọc Thụy, Quận Long Biên, Hà Nội": {
+    "lat": 21.0438263,
+    "lng": 105.86562
+  },
+  "Phường Cầu Dền, Quận Hai Bà Trưng, Hà Nội": {
+    "lat": 21.005453,
+    "lng": 105.8606225
+  },
+  "Phường Phú Lương, Quận Hà Đông, Hà Nội": {
+    "lat": 20.9540708,
+    "lng": 105.7600855
+  },
+  "Phường Bạch Đằng, Quận Hai Bà Trưng, Hà Nội": {
+    "lat": 21.005453,
+    "lng": 105.8606225
+  },
+  "Phường Phú La, Quận Hà Đông, Hà Nội": {
+    "lat": 20.9540708,
+    "lng": 105.7600855
+  },
+  "Phường Hà Cầu, Quận Hà Đông, Hà Nội": {
+    "lat": 21.0398796,
+    "lng": 105.8051121
+  },
+  "Phường Láng Thượng, Quận Đống Đa, Hà Nội": {
+    "lat": 21.0145101,
+    "lng": 105.8234093
+  },
+  "Phường Phương Liệt, Quận Thanh Xuân, Hà Nội": {
+    "lat": 20.9973524,
+    "lng": 105.8383941
+  },
+  "Phường Vĩnh Hưng, Quận Hoàng Mai, Hà Nội": {
+    "lat": 20.975392,
+    "lng": 105.8573399
+  },
+  "Phường Thanh Nhàn, Quận Hai Bà Trưng, Hà Nội": {
+    "lat": 21.005453,
+    "lng": 105.8606225
+  },
+  "Phường Cự Khối, Quận Long Biên, Hà Nội": {
+    "lat": 21.0099172,
+    "lng": 105.9047681
+  },
+  "Phường Đội Cấn, Quận Ba Đình, Hà Nội": {
+    "lat": 21.0343738,
+    "lng": 105.8306015
+  },
+  "Phường Thịnh Quang, Quận Đống Đa, Hà Nội": {
+    "lat": 21.0145101,
+    "lng": 105.8234093
+  },
+  "Phường Trung Hoà, Quận Cầu Giấy, Hà Nội": {
+    "lat": 21.0298464,
+    "lng": 105.7913272
+  },
+  "Phường Quỳnh Mai, Quận Hai Bà Trưng, Hà Nội": {
+    "lat": 21.005453,
+    "lng": 105.8606225
+  },
+  "Phường Nam Đồng, Quận Đống Đa, Hà Nội": {
+    "lat": 21.0145101,
+    "lng": 105.8234093
+  },
+  "Phường Dịch Vọng Hậu, Quận Cầu Giấy, Hà Nội": {
+    "lat": 21.0388103,
+    "lng": 105.7818897
+  },
+  "Phường Nghĩa Tân, Quận Cầu Giấy, Hà Nội": {
+    "lat": 21.0435605,
+    "lng": 105.7887379
+  },
+  "Xã Cự Khê, Huyện Thanh Oai, Hà Nội": {
+    "lat": 20.8634475,
+    "lng": 105.7610252
+  },
+  "Phường Vĩnh Tuy, Quận Hai Bà Trưng, Hà Nội": {
+    "lat": 21.005453,
+    "lng": 105.8606225
+  },
+  "Phường Quảng An, Quận Tây Hồ, Hà Nội": {
+    "lat": 21.0682703,
+    "lng": 105.8239615
+  },
+  "Phường Yên Nghĩa, Quận Hà Đông, Hà Nội": {
+    "lat": 20.9540708,
+    "lng": 105.7600855
+  },
+  "Phường Thành Công, Quận Ba Đình, Hà Nội": {
+    "lat": 21.0347091,
+    "lng": 105.8245193
+  },
+  "Phường Giáp Bát, Quận Hoàng Mai, Hà Nội": {
+    "lat": 20.975392,
+    "lng": 105.8573399
+  },
+  "Phường Dịch Vọng, Quận Cầu Giấy, Hà Nội": {
+    "lat": 21.0352138,
+    "lng": 105.7924703
+  },
+  "Phường Quang Trung, Quận Đống Đa, Hà Nội": {
+    "lat": 21.0145101,
+    "lng": 105.8234093
+  },
+  "Phường Thanh Xuân Bắc, Quận Thanh Xuân, Hà Nội": {
+    "lat": 21.0412566,
+    "lng": 105.751144
+  },
+  "Phường Phương Mai, Quận Đống Đa, Hà Nội": {
+    "lat": 21.0145101,
+    "lng": 105.8234093
+  },
+  "Phường Bạch Mai, Quận Hai Bà Trưng, Hà Nội": {
+    "lat": 21.005453,
+    "lng": 105.8606225
+  },
+  "Phường Thanh Trì, Quận Hoàng Mai, Hà Nội": {
+    "lat": 20.975392,
+    "lng": 105.8573399
+  },
+  "Phường Thượng Thanh, Quận Long Biên, Hà Nội": {
+    "lat": 21.0180529,
+    "lng": 105.9016988
+  },
+  "Phường Trần Phú, Quận Hoàng Mai, Hà Nội": {
+    "lat": 20.975392,
+    "lng": 105.8573399
+  },
+  "Phường Nguyễn Trãi, Quận Hà Đông, Hà Nội": {
+    "lat": 20.9540708,
+    "lng": 105.7600855
+  },
+  "Phường Dương Nội, Quận Hà Đông, Hà Nội": {
+    "lat": 20.9614029,
+    "lng": 105.7633591
+  },
+  "Phường Hạ Đình, Quận Thanh Xuân, Hà Nội": {
+    "lat": 21.0398998,
+    "lng": 105.8475957
+  },
+  "Phường Thanh Xuân Nam, Quận Thanh Xuân, Hà Nội": {
+    "lat": 21.0380687,
+    "lng": 105.7466523
+  },
+  "Xã Vân Canh, Huyện Hoài Đức, Hà Nội": {
+    "lat": 21.0228962,
+    "lng": 105.7035484
+  },
+  "Xã Phù Lỗ, Huyện Sóc Sơn, Hà Nội": {
+    "lat": 21.256018,
+    "lng": 105.8496735
+  },
+  "Phường Phố Huế, Quận Hai Bà Trưng, Hà Nội": {
+    "lat": 21.005453,
+    "lng": 105.8606225
+  },
+  "Phường Đồng Tâm, Quận Hai Bà Trưng, Hà Nội": {
+    "lat": 21.005453,
+    "lng": 105.8606225
+  },
+  "Phường Xuân Phương, Quận Nam Từ Liêm, Hà Nội": {
+    "lat": 21.0380687,
+    "lng": 105.7466523
+  },
+  "Phường Phạm Đình Hổ, Quận Hai Bà Trưng, Hà Nội": {
+    "lat": 21.005453,
+    "lng": 105.8606225
+  },
+  "Xã La Phù, Huyện Hoài Đức, Hà Nội": {
+    "lat": 21.0228962,
+    "lng": 105.7035484
+  },
+  "Phường Ngọc Lâm, Quận Long Biên, Hà Nội": {
+    "lat": 21.036727,
+    "lng": 105.898499
+  },
+  "Phường Mộ Lao, Quận Hà Đông, Hà Nội": {
+    "lat": 20.9540708,
+    "lng": 105.7600855
+  },
+  "Phường Phú Thượng, Quận Tây Hồ, Hà Nội": {
+    "lat": 21.0791733,
+    "lng": 105.815656
+  },
+  "Phường Việt Hưng, Quận Long Biên, Hà Nội": {
+    "lat": 21.0695094,
+    "lng": 105.9046593
+  },
+  "Phường Đông Ngạc, Quận Bắc Từ Liêm, Hà Nội": {
+    "lat": 21.069798,
+    "lng": 105.7744412
+  },
+  "Phường Thổ Quan, Quận Đống Đa, Hà Nội": {
+    "lat": 21.0145101,
+    "lng": 105.8234093
+  },
+  "Phường Lê Đại Hành, Quận Hai Bà Trưng, Hà Nội": {
+    "lat": 21.005453,
+    "lng": 105.8606225
+  },
+  "Phường Khương Thượng, Quận Đống Đa, Hà Nội": {
+    "lat": 21.0145101,
+    "lng": 105.8234093
+  },
+  "Phường Phú Lãm, Quận Hà Đông, Hà Nội": {
+    "lat": 20.9540708,
+    "lng": 105.7600855
+  },
+  "Xã Cổ Bi, Huyện Gia Lâm, Hà Nội": {
+    "lat": 21.0237594,
+    "lng": 105.9397851
+  },
+  "Phường Biên Giang, Quận Hà Đông, Hà Nội": {
+    "lat": 20.9540708,
+    "lng": 105.7600855
+  },
+  "Phường Hàng Bột, Quận Đống Đa, Hà Nội": {
+    "lat": 21.0145101,
+    "lng": 105.8234093
+  },
+  "Phường Cổ Nhuế 2, Quận Bắc Từ Liêm, Hà Nội": {
+    "lat": 21.0453503,
+    "lng": 105.7861826
+  },
+  "Phường Giảng Võ, Quận Ba Đình, Hà Nội": {
+    "lat": 21.0291095,
+    "lng": 105.8115454
+  },
+  "Thị trấn Chúc Sơn, Huyện Chương Mỹ, Hà Nội": {
+    "lat": 20.92366,
+    "lng": 105.7016985
+  },
+  "Xã Kiêu Kỵ, Huyện Gia Lâm, Hà Nội": {
+    "lat": 21.0237594,
+    "lng": 105.9397851
+  },
+  "Phường Cát Linh, Quận Đống Đa, Hà Nội": {
+    "lat": 21.0145101,
+    "lng": 105.8234093
+  },
+  "Phường Quỳnh Lôi, Quận Hai Bà Trưng, Hà Nội": {
+    "lat": 21.005453,
+    "lng": 105.8606225
+  },
+  "Phường Yên Sở, Quận Hoàng Mai, Hà Nội": {
+    "lat": 20.975392,
+    "lng": 105.8573399
+  },
+  "Xã Đặng Xá, Huyện Gia Lâm, Hà Nội": {
+    "lat": 21.0237594,
+    "lng": 105.9397851
+  },
+  "Phường Yết Kiêu, Quận Hà Đông, Hà Nội": {
+    "lat": 20.9540708,
+    "lng": 105.7600855
+  },
+  "Phường Cửa Đông, Quận Hoàn Kiếm, Hà Nội": {
+    "lat": 21.031926,
+    "lng": 105.8445575
+  },
+  "Phường Giang Biên, Quận Long Biên, Hà Nội": {
+    "lat": 21.0630178,
+    "lng": 105.9180118
+  },
+  "Phường Chương Dương, Quận Hoàn Kiếm, Hà Nội": {
+    "lat": 21.0307816,
+    "lng": 105.8540626
+  },
+  "Phường Phúc La, Quận Hà Đông, Hà Nội": {
+    "lat": 20.9540708,
+    "lng": 105.7600855
+  },
+  "Phường Phúc Đồng, Quận Long Biên, Hà Nội": {
+    "lat": 21.0365344,
+    "lng": 105.903586
+  },
+  "Phường Thượng Cát, Quận Bắc Từ Liêm, Hà Nội": {
+    "lat": 21.0730119,
+    "lng": 105.7613958
+  },
+  "Phường Phúc Xá, Quận Ba Đình, Hà Nội": {
+    "lat": 21.0347091,
+    "lng": 105.8245193
+  },
+  "Phường Văn Chương, Quận Đống Đa, Hà Nội": {
+    "lat": 21.0145101,
+    "lng": 105.8234093
+  },
+  "Xã Tứ Hiệp, Huyện Thanh Trì, Hà Nội": {
+    "lat": 20.9415559,
+    "lng": 105.8360164
+  },
+  "Xã Đông Dư, Huyện Gia Lâm, Hà Nội": {
+    "lat": 21.0237594,
+    "lng": 105.9397851
+  },
+  "Phường Thanh Xuân Trung, Quận Thanh Xuân, Hà Nội": {
+    "lat": 21.0180529,
+    "lng": 105.9016988
+  },
+  "Phường Phương Liên, Quận Đống Đa, Hà Nội": {
+    "lat": 21.0145101,
+    "lng": 105.8234093
+  },
+  "Phường Nhật Tân, Quận Tây Hồ, Hà Nội": {
+    "lat": 21.0682703,
+    "lng": 105.8239615
+  },
+  "Thị trấn Trạm Trôi, Huyện Hoài Đức, Hà Nội": {
+    "lat": 21.0228962,
+    "lng": 105.7035484
+  },
+  "Phường Sài Đồng, Quận Long Biên, Hà Nội": {
+    "lat": 21.0365344,
+    "lng": 105.903586
+  },
+  "Xã Tân Triều, Huyện Thanh Trì, Hà Nội": {
+    "lat": 20.9415559,
+    "lng": 105.8360164
+  },
+  "Xã Kim Chung, Huyện Đông Anh, Hà Nội": {
+    "lat": 21.140558,
+    "lng": 105.8466733
+  },
+  "Phường Văn Miếu, Quận Đống Đa, Hà Nội": {
+    "lat": 21.0281354,
+    "lng": 105.838589
+  },
+  "Xã Đông Hội, Huyện Đông Anh, Hà Nội": {
+    "lat": 21.140558,
+    "lng": 105.8466733
+  },
+  "Xã Phụng Châu, Huyện Chương Mỹ, Hà Nội": {
+    "lat": 20.92366,
+    "lng": 105.7016985
+  },
+  "Thị trấn Trâu Quỳ, Huyện Gia Lâm, Hà Nội": {
+    "lat": 21.0237594,
+    "lng": 105.9397851
+  },
+  "Phường Quán Thánh, Quận Ba Đình, Hà Nội": {
+    "lat": 21.030548,
+    "lng": 105.8403281
+  },
+  "Phường Phúc Lợi, Quận Long Biên, Hà Nội": {
+    "lat": 21.0460973,
+    "lng": 105.9177576
+  },
+  "Xã Hữu Hoà, Huyện Thanh Trì, Hà Nội": {
+    "lat": 20.9415559,
+    "lng": 105.8360164
+  },
+  "Phường Đồng Nhân, Quận Hai Bà Trưng, Hà Nội": {
+    "lat": 21.005453,
+    "lng": 105.8606225
+  },
+  "Phường Ngô Thì Nhậm, Quận Hai Bà Trưng, Hà Nội": {
+    "lat": 21.005453,
+    "lng": 105.8606225
+  },
+  "Phường Đồng Mai, Quận Hà Đông, Hà Nội": {
+    "lat": 21.0421414,
+    "lng": 105.781475
+  },
+  "Xã Đông La, Huyện Hoài Đức, Hà Nội": {
+    "lat": 21.0228962,
+    "lng": 105.7035484
+  },
+  "Phường Liên Mạc, Quận Bắc Từ Liêm, Hà Nội": {
+    "lat": 21.0730119,
+    "lng": 105.7613958
+  },
+  "Xã Ngọc Hồi, Huyện Thanh Trì, Hà Nội": {
+    "lat": 20.9415559,
+    "lng": 105.8360164
+  },
+  "Phường Bùi Thị Xuân, Quận Hai Bà Trưng, Hà Nội": {
+    "lat": 21.005453,
+    "lng": 105.8606225
+  },
+  "Phường Xuân Tảo, Quận Bắc Từ Liêm, Hà Nội": {
+    "lat": 21.0730119,
+    "lng": 105.7613958
+  },
+  "Phường Yên Phụ, Quận Tây Hồ, Hà Nội": {
+    "lat": 21.0682703,
+    "lng": 105.8239615
+  },
+  "Xã Thanh Liệt, Huyện Thanh Trì, Hà Nội": {
+    "lat": 20.9415559,
+    "lng": 105.8360164
+  },
+  "Phường Thụy Phương, Quận Bắc Từ Liêm, Hà Nội": {
+    "lat": 21.0730119,
+    "lng": 105.7613958
+  },
+  "Phường Hàng Bông, Quận Hoàn Kiếm, Hà Nội": {
+    "lat": 21.0307816,
+    "lng": 105.8540626
+  },
+  "Xã Nghiêm Xuyên, Huyện Thường Tín, Hà Nội": {
+    "lat": 20.8708029,
+    "lng": 105.862067
+  },
+  "Phường Nguyễn Du, Quận Hai Bà Trưng, Hà Nội": {
+    "lat": 21.005453,
+    "lng": 105.8606225
+  },
+  "Phường Tứ Liên, Quận Tây Hồ, Hà Nội": {
+    "lat": 21.0682703,
+    "lng": 105.8239615
+  },
+  "Phường Phan Chu Trinh, Quận Hoàn Kiếm, Hà Nội": {
+    "lat": 21.0307816,
+    "lng": 105.8540626
+  },
+  "Xã Vĩnh Quỳnh, Huyện Thanh Trì, Hà Nội": {
+    "lat": 20.9415559,
+    "lng": 105.8360164
+  },
+  "Phường Cửa Nam, Quận Hoàn Kiếm, Hà Nội": {
+    "lat": 21.031926,
+    "lng": 105.8445575
+  },
+  "Xã Di Trạch, Huyện Hoài Đức, Hà Nội": {
+    "lat": 21.0228962,
+    "lng": 105.7035484
+  },
+  "Phường Hàng Bồ, Quận Hoàn Kiếm, Hà Nội": {
+    "lat": 21.0307816,
+    "lng": 105.8540626
+  },
+  "Xã Võng La, Huyện Đông Anh, Hà Nội": {
+    "lat": 21.140558,
+    "lng": 105.8466733
+  },
+  "Phường Điện Biên, Quận Ba Đình, Hà Nội": {
+    "lat": 21.030548,
+    "lng": 105.8403281
+  },
+  "Xã Bắc Hồng, Huyện Đông Anh, Hà Nội": {
+    "lat": 21.140558,
+    "lng": 105.8466733
+  },
+  "Xã Hải Bối, Huyện Đông Anh, Hà Nội": {
+    "lat": 21.140558,
+    "lng": 105.8466733
+  },
+  "Xã Đại Yên, Huyện Chương Mỹ, Hà Nội": {
+    "lat": 20.92366,
+    "lng": 105.7016985
+  },
+  "Phường Ngô Quyền, Thị xã Sơn Tây, Hà Nội": {
+    "lat": 21.1404505,
+    "lng": 105.5021468
+  },
+  "Phường Trần Hưng Đạo, Quận Hoàn Kiếm, Hà Nội": {
+    "lat": 21.0307816,
+    "lng": 105.8540626
+  },
+  "Xã Liên Ninh, Huyện Thanh Trì, Hà Nội": {
+    "lat": 20.9415559,
+    "lng": 105.8360164
+  },
+  "Phường Hàng Bài, Quận Hoàn Kiếm, Hà Nội": {
+    "lat": 21.0307816,
+    "lng": 105.8540626
+  },
+  "Xã Đông Mỹ, Huyện Thanh Trì, Hà Nội": {
+    "lat": 20.9415559,
+    "lng": 105.8360164
+  },
+  "Phường Đức Thắng, Quận Bắc Từ Liêm, Hà Nội": {
+    "lat": 21.0730119,
+    "lng": 105.7613958
+  },
+  "Phường Tràng Tiền, Quận Hoàn Kiếm, Hà Nội": {
+    "lat": 21.0254884,
+    "lng": 105.8559784
+  },
+  "Phường Hàng Bạc, Quận Hoàn Kiếm, Hà Nội": {
+    "lat": 21.0307816,
+    "lng": 105.8540626
+  },
+  "Xã Ngũ Hiệp, Huyện Thanh Trì, Hà Nội": {
+    "lat": 20.9415559,
+    "lng": 105.8360164
+  },
+  "Xã An Thượng, Huyện Hoài Đức, Hà Nội": {
+    "lat": 21.0228962,
+    "lng": 105.7035484
+  },
+  "Phường Hàng Đào, Quận Hoàn Kiếm, Hà Nội": {
+    "lat": 21.0307816,
+    "lng": 105.8540626
+  },
+  "Xã Yên Thường, Huyện Gia Lâm, Hà Nội": {
+    "lat": 21.0237594,
+    "lng": 105.9397851
+  },
+  "Xã Duyên Hà, Huyện Thanh Trì, Hà Nội": {
+    "lat": 20.9415559,
+    "lng": 105.8360164
+  },
+  "Phường Đồng Xuân, Quận Hoàn Kiếm, Hà Nội": {
+    "lat": 21.0398034,
+    "lng": 105.8477526
+  },
+  "Phường Lý Thái Tổ, Quận Hoàn Kiếm, Hà Nội": {
+    "lat": 21.0288837,
+    "lng": 105.8566691
+  },
+  "Xã An Khánh, Huyện Hoài Đức, Hà Nội": {
+    "lat": 21.0228962,
+    "lng": 105.7035484
+  },
+  "Thị trấn Yên Viên, Huyện Gia Lâm, Hà Nội": {
+    "lat": 21.0903099,
+    "lng": 105.9225529
+  },
+  "Phường Hàng Buồm, Quận Hoàn Kiếm, Hà Nội": {
+    "lat": 21.0307816,
+    "lng": 105.8540626
+  },
+  "Xã Lại Yên, Huyện Hoài Đức, Hà Nội": {
+    "lat": 21.0228962,
+    "lng": 105.7035484
+  },
+  "Xã Bích Hòa, Huyện Thanh Oai, Hà Nội": {
+    "lat": 20.8634475,
+    "lng": 105.7610252
+  },
+  "Thị trấn Quang Minh, Huyện Mê Linh, Hà Nội": {
+    "lat": 21.1822074,
+    "lng": 105.7218568
+  },
+  "Thị trấn Kim Bài, Huyện Thanh Oai, Hà Nội": {
+    "lat": 20.8634475,
+    "lng": 105.7610252
+  },
+  "Xã Khánh Hà, Huyện Thường Tín, Hà Nội": {
+    "lat": 20.8708029,
+    "lng": 105.862067
+  },
+  "Phường Tây Tựu, Quận Bắc Từ Liêm, Hà Nội": {
+    "lat": 21.0563409,
+    "lng": 105.7470725
+  },
+  "Xã Thủy Xuân Tiên, Huyện Chương Mỹ, Hà Nội": {
+    "lat": 20.92366,
+    "lng": 105.7016985
+  },
+  "Xã Kim Nỗ, Huyện Đông Anh, Hà Nội": {
+    "lat": 21.140558,
+    "lng": 105.8466733
+  },
+  "Phường Hàng Trống, Quận Hoàn Kiếm, Hà Nội": {
+    "lat": 21.0307816,
+    "lng": 105.8540626
+  },
+  "Xã Tân Lập, Huyện Đan Phượng, Hà Nội": {
+    "lat": 21.119409,
+    "lng": 105.6788843
+  },
+  "Xã Đại Thịnh, Huyện Mê Linh, Hà Nội": {
+    "lat": 21.1822074,
+    "lng": 105.7218568
+  },
+  "Phường Hàng Mã, Quận Hoàn Kiếm, Hà Nội": {
+    "lat": 21.0397584,
+    "lng": 105.8473362
+  },
+  "Xã Bình Yên, Huyện Thạch Thất, Hà Nội": {
+    "lat": 21.0564462,
+    "lng": 105.5807397
+  },
+  "Xã Vạn Phúc, Huyện Thanh Trì, Hà Nội": {
+    "lat": 20.9415559,
+    "lng": 105.8360164
+  },
+  "Xã Phú Cường, Huyện Sóc Sơn, Hà Nội": {
+    "lat": 21.2145692,
+    "lng": 105.8034987
+  },
+  "Xã Đa Tốn, Huyện Gia Lâm, Hà Nội": {
+    "lat": 21.0237594,
+    "lng": 105.9397851
+  },
+  "Xã Minh Phú, Huyện Sóc Sơn, Hà Nội": {
+    "lat": 21.2145692,
+    "lng": 105.8034987
+  },
+  "Phường Nguyễn Trung Trực, Quận Ba Đình, Hà Nội": {
+    "lat": 21.0347091,
+    "lng": 105.8245193
+  },
+  "Thị trấn Quốc Oai, Huyện Quốc Oai, Hà Nội": {
+    "lat": 20.9924611,
+    "lng": 105.6450966
+  },
+  "Thị trấn Thường Tín, Huyện Thường Tín, Hà Nội": {
+    "lat": 20.8708029,
+    "lng": 105.862067
+  },
+  "Phường Phú Thịnh, Thị xã Sơn Tây, Hà Nội": {
+    "lat": 21.1404505,
+    "lng": 105.5021468
+  },
+  "Xã Đại áng, Huyện Thanh Trì, Hà Nội": {
+    "lat": 20.9415559,
+    "lng": 105.8360164
+  },
+  "Xã Võng Xuyên, Huyện Phúc Thọ, Hà Nội": {
+    "lat": 21.1042893,
+    "lng": 105.5446784
+  },
+  "Xã Phú Mãn, Huyện Quốc Oai, Hà Nội": {
+    "lat": 20.9924611,
+    "lng": 105.6450966
+  },
+  "Thị trấn Phú Xuyên, Huyện Phú Xuyên, Hà Nội": {
+    "lat": 20.7451715,
+    "lng": 105.9132989
+  },
+  "Xã Hà Hồi, Huyện Thường Tín, Hà Nội": {
+    "lat": 20.8708029,
+    "lng": 105.862067
+  },
+  "Xã Phú Châu, Huyện Ba Vì, Hà Nội": {
+    "lat": 21.1998493,
+    "lng": 105.4233197
+  },
+  "Xã Cổ Đông, Thị xã Sơn Tây, Hà Nội": {
+    "lat": 21.1404505,
+    "lng": 105.5021468
+  },
+  "Xã Vân Côn, Huyện Hoài Đức, Hà Nội": {
+    "lat": 21.0228962,
+    "lng": 105.7035484
+  },
+  "Xã Xuân Giang, Huyện Sóc Sơn, Hà Nội": {
+    "lat": 21.256018,
+    "lng": 105.8496735
+  },
+  "Xã Tam Đồng, Huyện Mê Linh, Hà Nội": {
+    "lat": 21.1822074,
+    "lng": 105.7218568
+  },
+  "Xã Dương Quang, Huyện Gia Lâm, Hà Nội": {
+    "lat": 21.0237594,
+    "lng": 105.9397851
+  },
+  "Thị trấn Đông Anh, Huyện Đông Anh, Hà Nội": {
+    "lat": 21.140558,
+    "lng": 105.8466733
+  },
+  "Xã Đông Yên, Huyện Quốc Oai, Hà Nội": {
+    "lat": 20.9924611,
+    "lng": 105.6450966
+  },
+  "Xã Vân Nội, Huyện Đông Anh, Hà Nội": {
+    "lat": 21.140558,
+    "lng": 105.8466733
+  },
+  "Xã Tiên Dược, Huyện Sóc Sơn, Hà Nội": {
+    "lat": 21.256018,
+    "lng": 105.8496735
+  },
+  "Xã Hương Ngải, Huyện Thạch Thất, Hà Nội": {
+    "lat": 21.0564462,
+    "lng": 105.5807397
+  },
+  "Xã Hoàng Văn Thụ, Huyện Chương Mỹ, Hà Nội": {
+    "lat": 20.92366,
+    "lng": 105.7016985
+  },
+  "Xã Ngọc Liệp, Huyện Quốc Oai, Hà Nội": {
+    "lat": 20.9924611,
+    "lng": 105.6450966
+  },
+  "Xã Nhị Khê, Huyện Thường Tín, Hà Nội": {
+    "lat": 20.8708029,
+    "lng": 105.862067
+  },
+  "Thị trấn Xuân Mai, Huyện Chương Mỹ, Hà Nội": {
+    "lat": 20.92366,
+    "lng": 105.7016985
+  },
+  "Xã Bát Tràng, Huyện Gia Lâm, Hà Nội": {
+    "lat": 21.0237594,
+    "lng": 105.9397851
+  },
+  "Xã Nam Hồng, Huyện Đông Anh, Hà Nội": {
+    "lat": 21.140558,
+    "lng": 105.8466733
+  },
+  "Xã Thạch Hoà, Huyện Thạch Thất, Hà Nội": {
+    "lat": 21.0564462,
+    "lng": 105.5807397
+  },
+  "Xã Tam Hưng, Huyện Thanh Oai, Hà Nội": {
+    "lat": 20.8634475,
+    "lng": 105.7610252
+  },
+  "Xã Nguyên Khê, Huyện Đông Anh, Hà Nội": {
+    "lat": 21.140558,
+    "lng": 105.8466733
+  },
+  "Xã Sài Sơn, Huyện Quốc Oai, Hà Nội": {
+    "lat": 20.9924611,
+    "lng": 105.6450966
+  },
+  "Xã Ninh Hiệp, Huyện Gia Lâm, Hà Nội": {
+    "lat": 21.0237594,
+    "lng": 105.9397851
+  },
+  "Xã Uy Nỗ, Huyện Đông Anh, Hà Nội": {
+    "lat": 21.140558,
+    "lng": 105.8466733
+  },
+  "Phường Viên Sơn, Thị xã Sơn Tây, Hà Nội": {
+    "lat": 21.1404505,
+    "lng": 105.5021468
+  },
+  "Xã Ninh Sở, Huyện Thường Tín, Hà Nội": {
+    "lat": 20.8708029,
+    "lng": 105.862067
+  },
+  "Xã Phương Trung, Huyện Thanh Oai, Hà Nội": {
+    "lat": 20.8634475,
+    "lng": 105.7610252
+  },
+  "Xã Vĩnh Ngọc, Huyện Đông Anh, Hà Nội": {
+    "lat": 21.140558,
+    "lng": 105.8466733
+  },
+  "Xã Đại Mạch, Huyện Đông Anh, Hà Nội": {
+    "lat": 21.140558,
+    "lng": 105.8466733
+  },
+  "Xã Kim Sơn, Huyện Gia Lâm, Hà Nội": {
+    "lat": 21.0237594,
+    "lng": 105.9397851
+  },
+  "Xã Minh Khai, Huyện Hoài Đức, Hà Nội": {
+    "lat": 21.0228962,
+    "lng": 105.7035484
+  },
+  "Xã Phú Cát, Huyện Quốc Oai, Hà Nội": {
+    "lat": 20.9924611,
+    "lng": 105.6450966
+  },
+  "Xã Duyên Thái, Huyện Thường Tín, Hà Nội": {
+    "lat": 20.8708029,
+    "lng": 105.862067
+  },
+  "Xã Vân Hòa, Huyện Ba Vì, Hà Nội": {
+    "lat": 21.1998493,
+    "lng": 105.4233197
+  },
+  "Phường Trung Sơn Trầm, Thị xã Sơn Tây, Hà Nội": {
+    "lat": 21.1404505,
+    "lng": 105.5021468
+  },
+  "Xã Dương Xá, Huyện Gia Lâm, Hà Nội": {
+    "lat": 21.0237594,
+    "lng": 105.9397851
+  },
+  "Xã Xuân Nộn, Huyện Đông Anh, Hà Nội": {
+    "lat": 21.140558,
+    "lng": 105.8466733
+  },
+  "Xã Việt Hùng, Huyện Đông Anh, Hà Nội": {
+    "lat": 21.140558,
+    "lng": 105.8466733
+  },
+  "Xã Sơn Đông, Thị xã Sơn Tây, Hà Nội": {
+    "lat": 21.1404505,
+    "lng": 105.5021468
+  },
+  "Xã Văn Bình, Huyện Thường Tín, Hà Nội": {
+    "lat": 20.8708029,
+    "lng": 105.862067
+  },
+  "Phường Hàng Gai, Quận Hoàn Kiếm, Hà Nội": {
+    "lat": 21.0307816,
+    "lng": 105.8540626
+  },
+  "Xã Thanh Cao, Huyện Thanh Oai, Hà Nội": {
+    "lat": 20.8634475,
+    "lng": 105.7610252
+  },
+  "Xã Mai Đình, Huyện Sóc Sơn, Hà Nội": {
+    "lat": 21.256018,
+    "lng": 105.8496735
+  },
+  "Xã Đông Xuân, Huyện Sóc Sơn, Hà Nội": {
+    "lat": 21.256018,
+    "lng": 105.8496735
+  },
+  "Xã Mai Lâm, Huyện Đông Anh, Hà Nội": {
+    "lat": 21.140558,
+    "lng": 105.8466733
+  },
+  "Xã Sơn Đồng, Huyện Hoài Đức, Hà Nội": {
+    "lat": 21.0228962,
+    "lng": 105.7035484
+  },
+  "Xã Tân Xã, Huyện Thạch Thất, Hà Nội": {
+    "lat": 21.0212563,
+    "lng": 105.5512084
+  },
+  "Phường Xuân Khanh, Thị xã Sơn Tây, Hà Nội": {
+    "lat": 21.1404505,
+    "lng": 105.5021468
+  },
+  "Xã Thượng Mỗ, Huyện Đan Phượng, Hà Nội": {
+    "lat": 21.119409,
+    "lng": 105.6788843
+  },
+  "Xã Nghĩa Hương, Huyện Quốc Oai, Hà Nội": {
+    "lat": 20.9924611,
+    "lng": 105.6450966
+  },
+  "Xã Dương Liễu, Huyện Hoài Đức, Hà Nội": {
+    "lat": 21.0228962,
+    "lng": 105.7035484
+  },
+  "Xã Đức Thượng, Huyện Hoài Đức, Hà Nội": {
+    "lat": 21.0228962,
+    "lng": 105.7035484
+  },
+  "Xã Kim Hoa, Huyện Mê Linh, Hà Nội": {
+    "lat": 21.1822074,
+    "lng": 105.7218568
+  },
+  "Xã Tiền Phong, Huyện Mê Linh, Hà Nội": {
+    "lat": 21.1822074,
+    "lng": 105.7218568
+  },
+  "Xã Bình Phú, Huyện Thạch Thất, Hà Nội": {
+    "lat": 21.0564462,
+    "lng": 105.5807397
+  },
+  "Xã Dục Tú, Huyện Đông Anh, Hà Nội": {
+    "lat": 21.140558,
+    "lng": 105.8466733
+  },
+  "Xã Đức Giang, Huyện Hoài Đức, Hà Nội": {
+    "lat": 21.0228962,
+    "lng": 105.7035484
+  },
+  "Xã Yên Viên, Huyện Gia Lâm, Hà Nội": {
+    "lat": 21.0237594,
+    "lng": 105.9397851
+  },
+  "Xã Đồng Quang, Huyện Quốc Oai, Hà Nội": {
+    "lat": 20.9924611,
+    "lng": 105.6450966
+  },
+  "Xã Quang Tiến, Huyện Sóc Sơn, Hà Nội": {
+    "lat": 21.256018,
+    "lng": 105.8496735
+  },
+  "Xã Đại Thành, Huyện Quốc Oai, Hà Nội": {
+    "lat": 20.9924611,
+    "lng": 105.6450966
+  },
+  "Xã Hòa Thạch, Huyện Quốc Oai, Hà Nội": {
+    "lat": 20.9924611,
+    "lng": 105.6450966
+  },
+  "Xã Tiến Xuân, Huyện Thạch Thất, Hà Nội": {
+    "lat": 21.0564462,
+    "lng": 105.5807397
+  },
+  "Xã Phù Linh, Huyện Sóc Sơn, Hà Nội": {
+    "lat": 21.256018,
+    "lng": 105.8496735
+  },
+  "Xã Đỗ Động, Huyện Thanh Oai, Hà Nội": {
+    "lat": 20.8634475,
+    "lng": 105.7610252
+  },
+  "Xã Phú Minh, Huyện Sóc Sơn, Hà Nội": {
+    "lat": 21.2145692,
+    "lng": 105.8034987
+  },
+  "Xã Tiên Dương, Huyện Đông Anh, Hà Nội": {
+    "lat": 21.140558,
+    "lng": 105.8466733
+  },
+  "Xã Hợp Thanh, Huyện Mỹ Đức, Hà Nội": {
+    "lat": 20.6866968,
+    "lng": 105.7444567
+  },
+  "Xã Minh Trí, Huyện Sóc Sơn, Hà Nội": {
+    "lat": 21.256018,
+    "lng": 105.8496735
+  },
+  "Xã Tân Hội, Huyện Đan Phượng, Hà Nội": {
+    "lat": 21.119409,
+    "lng": 105.6788843
+  },
+  "Xã Thanh Xuân, Huyện Sóc Sơn, Hà Nội": {
+    "lat": 21.256018,
+    "lng": 105.8496735
+  },
+  "Xã Song Phương, Huyện Hoài Đức, Hà Nội": {
+    "lat": 21.0228962,
+    "lng": 105.7035484
+  },
+  "Xã Lê Lợi, Huyện Thường Tín, Hà Nội": {
+    "lat": 20.8708029,
+    "lng": 105.862067
+  },
+  "Thị trấn Sóc Sơn, Huyện Sóc Sơn, Hà Nội": {
+    "lat": 21.256018,
+    "lng": 105.8496735
+  },
+  "Thị trấn Liên Quan, Huyện Thạch Thất, Hà Nội": {
+    "lat": 21.0564462,
+    "lng": 105.5807397
+  },
+  "Xã Mê Linh, Huyện Mê Linh, Hà Nội": {
+    "lat": 21.1822074,
+    "lng": 105.7218568
+  },
+  "Xã Kim Sơn, Thị xã Sơn Tây, Hà Nội": {
+    "lat": 21.1404505,
+    "lng": 105.5021468
+  },
+  "Xã Đan Phượng, Huyện Đan Phượng, Hà Nội": {
+    "lat": 21.119409,
+    "lng": 105.6788843
+  },
+  "Xã Vân Tảo, Huyện Thường Tín, Hà Nội": {
+    "lat": 20.8708029,
+    "lng": 105.862067
+  },
+  "Xã Đình Xuyên, Huyện Gia Lâm, Hà Nội": {
+    "lat": 21.0237594,
+    "lng": 105.9397851
+  },
+  "Xã Phù Đổng, Huyện Gia Lâm, Hà Nội": {
+    "lat": 21.0237594,
+    "lng": 105.9397851
+  },
+  "Xã Phú Sơn, Huyện Ba Vì, Hà Nội": {
+    "lat": 21.1998493,
+    "lng": 105.4233197
+  },
+  "Xã Ngọc Tảo, Huyện Phúc Thọ, Hà Nội": {
+    "lat": 21.1042893,
+    "lng": 105.5446784
+  },
+  "Xã Phương Đình, Huyện Đan Phượng, Hà Nội": {
+    "lat": 21.119409,
+    "lng": 105.6788843
+  }
+}
