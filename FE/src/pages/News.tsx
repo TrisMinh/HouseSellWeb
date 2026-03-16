@@ -1,4 +1,5 @@
 import { useState, useLayoutEffect, useEffect, useRef } from 'react';
+import { getNewsList, NewsItem } from '@/lib/newsApi';
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
 import { TrendingUp, TrendingDown, BarChart3, MapPin, Calendar, ArrowRight, ChevronRight, Newspaper, Activity, DollarSign, Users, Eye, Clock, Star, Layers, ArrowUpRight } from 'lucide-react';
@@ -329,6 +330,50 @@ const News = () => {
     window.scrollTo({ top: 0, left: 0, behavior: 'instant' as ScrollBehavior });
   }, []);
 
+  const [newsList, setNewsList] = useState<NewsItem[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchNews = async () => {
+      try {
+        const response = await getNewsList();
+        // Xử lý API return pagination hoặc array
+        if ('results' in response && Array.isArray(response.results)) {
+          setNewsList(response.results);
+        } else if (Array.isArray(response)) {
+          setNewsList(response);
+        }
+      } catch (error) {
+        console.error("Failed to load news:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchNews();
+  }, []);
+
+  // Use the first article as featured if available, else keep the mock placeholder
+  const actualFeatured = newsList.length > 0 ? {
+    id: newsList[0].id,
+    title: newsList[0].title,
+    excerpt: newsList[0].content.substring(0, 150) + "...",
+    date: new Date(newsList[0].created_at).toLocaleDateString(),
+    readTime: "5 min read",
+    image: newsList[0].thumbnail || FEATURED_ARTICLE.image
+  } : FEATURED_ARTICLE;
+
+  // Map remaining items or use mock items if none
+  const mappedNewsArticles = newsList.slice(1).map(article => ({
+      id: article.id,
+      title: article.title,
+      excerpt: article.content.substring(0, 100) + "...",
+      date: new Date(article.created_at).toLocaleDateString(),
+      readTime: "5 min",
+      image: article.thumbnail || NEWS_ARTICLES[1].image
+  }));
+
+  const displayNews = mappedNewsArticles.length > 0 ? mappedNewsArticles : NEWS_ARTICLES;
+
   return (
     <div className="min-h-screen bg-[#F6F7F9] font-['Josefin_Sans']">
       <style>{`@import url('https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@300;400;500;600;700&display=swap');`}</style>
@@ -346,8 +391,8 @@ const News = () => {
           >
             <div className="relative h-[360px] md:h-[480px]">
               <img
-                src={FEATURED_ARTICLE.image}
-                alt={FEATURED_ARTICLE.title}
+                src={actualFeatured.image}
+                alt={actualFeatured.title}
                 className="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-700"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
@@ -356,17 +401,17 @@ const News = () => {
             <div className="absolute bottom-0 left-0 right-0 p-6 md:p-10">
               <div className="flex flex-wrap items-center gap-3 mb-4">
                 <span className="text-xs font-semibold text-white/70 flex items-center gap-1">
-                  <Calendar className="w-3.5 h-3.5" />{FEATURED_ARTICLE.date}
+                  <Calendar className="w-3.5 h-3.5" />{actualFeatured.date}
                 </span>
                 <span className="text-xs font-semibold text-white/70 flex items-center gap-1">
-                  <Clock className="w-3.5 h-3.5" />{FEATURED_ARTICLE.readTime}
+                  <Clock className="w-3.5 h-3.5" />{actualFeatured.readTime}
                 </span>
               </div>
               <h1 className="text-2xl md:text-4xl font-bold text-white leading-tight mb-3 font-['Inter'] max-w-3xl">
-                {FEATURED_ARTICLE.title}
+                {actualFeatured.title}
               </h1>
               <p className="text-white/80 text-sm md:text-base max-w-2xl leading-relaxed mb-4 line-clamp-2 md:line-clamp-none">
-                {FEATURED_ARTICLE.excerpt}
+                {actualFeatured.excerpt}
               </p>
               <span className="inline-flex items-center gap-1 text-teal-300 font-bold text-sm group-hover:gap-2 transition-all">
                 Read Full Article <ArrowUpRight className="w-4 h-4" />
@@ -498,9 +543,13 @@ const News = () => {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {NEWS_ARTICLES.map((article, i) => (
-              <NewsCard key={article.id} article={article} index={i} />
-            ))}
+            {loading ? (
+                <div className="col-span-full py-10 text-center text-gray-500">Đang tải tin tức...</div>
+            ) : (
+              displayNews.map((article, i) => (
+                <NewsCard key={article.id} article={article as any} index={i} />
+              ))
+            )}
           </div>
 
           <button className="sm:hidden mt-6 w-full flex items-center justify-center gap-2 py-3.5 border-2 border-slate-200 rounded-xl text-sm font-bold text-slate-600 hover:bg-slate-50 hover:text-teal-600 transition-all cursor-pointer">

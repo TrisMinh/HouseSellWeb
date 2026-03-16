@@ -48,6 +48,8 @@ INSTALLED_APPS = [
     'django_filters',                           # ← THÊM
     'accounts',
     'properties',
+    'appointments',
+    'news',
     'prediction',
 ]
 

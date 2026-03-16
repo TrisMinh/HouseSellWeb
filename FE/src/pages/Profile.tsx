@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { updateProfile } from "@/lib/authApi";
+import { getMyAppointments, Appointment } from "@/lib/appointmentsApi";
 import { Line } from "react-chartjs-2";
 import {
   Chart as ChartJS,
@@ -129,8 +130,45 @@ const Profile = () => {
   const buyItemsPerPage = 5;
   const sellItemsPerPage = 9;
   
-  const paginatedBuy = BUY_LIST.slice((buyPage - 1) * buyItemsPerPage, buyPage * buyItemsPerPage);
-  const totalBuyPages = Math.ceil(BUY_LIST.length / buyItemsPerPage);
+  // Real appointments state
+  const [appointments, setAppointments] = useState<Appointment[]>([]);
+  const [loadingAppointments, setLoadingAppointments] = useState(false);
+
+  useEffect(() => {
+    const fetchAppointments = async () => {
+      if (activeTab === 'buy' && user) {
+        setLoadingAppointments(true);
+        try {
+          const response = await getMyAppointments();
+          if ('results' in response && Array.isArray(response.results)) {
+            setAppointments(response.results as Appointment[]);
+          } else if (Array.isArray(response)) {
+             setAppointments(response);
+          }
+        } catch (error) {
+          console.error("Failed to load appointments:", error);
+        } finally {
+          setLoadingAppointments(false);
+        }
+      }
+    };
+    fetchAppointments();
+  }, [activeTab, user]);
+
+  const displayBuyList = appointments.length > 0 ? 
+    appointments.map(a => ({
+      id: a.id,
+      property: a.property_title,
+      seller: a.property_owner,
+      date: `${a.time}, ${new Date(a.date).toLocaleDateString()}`,
+      status: a.status.charAt(0).toUpperCase() + a.status.slice(1),
+      price: "—", // Backend DTO doesn't include price yet, but that's fine for now
+      image: "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&q=80&w=600"
+    })) : 
+    BUY_LIST;
+
+  const paginatedBuy = displayBuyList.slice((buyPage - 1) * buyItemsPerPage, buyPage * buyItemsPerPage);
+  const totalBuyPages = Math.ceil(displayBuyList.length / buyItemsPerPage);
 
   const paginatedSell = SELL_LIST.slice((sellPage - 1) * sellItemsPerPage, sellPage * sellItemsPerPage);
   const totalSellPages = Math.ceil(SELL_LIST.length / sellItemsPerPage);
@@ -487,8 +525,11 @@ const Profile = () => {
               </div>
 
               <div className="grid grid-cols-1 gap-4">
-                {paginatedBuy.map((apt) => (
-                  <div key={apt.id} className="bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all p-5 flex flex-col md:flex-row items-center gap-5 cursor-pointer group">
+                {loadingAppointments ? (
+                    <div className="py-10 text-center text-gray-500">Đang tải dữ liệu...</div>
+                ) : (
+                  paginatedBuy.map((apt) => (
+                    <div key={apt.id} className="bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all p-5 flex flex-col md:flex-row items-center gap-5 cursor-pointer group">
                     <img src={apt.image} alt={apt.property} className="w-full md:w-28 h-28 rounded-xl object-cover flex-shrink-0 group-hover:scale-[1.02] transition-transform" />
                     <div className="flex-1 min-w-0">
                       <h4 className="text-lg font-bold text-gray-900 group-hover:text-[#0F766E] transition-colors truncate">{apt.property}</h4>
@@ -514,7 +555,7 @@ const Profile = () => {
                       </Link>
                     </div>
                   </div>
-                ))}
+                )))}
               </div>
               
               <PaginationControls 

@@ -7,8 +7,7 @@ class PropertyType(models.TextChoices):
     APARTMENT  = 'apartment',  'Căn hộ'
     LAND       = 'land',       'Đất nền'
     VILLA      = 'villa',      'Biệt thự'
-    OFFICE     = 'office',     'Văn phòng'
-    SHOPHOUSE  = 'shophouse',  'Nhà phố thương mại'
+    OTHER      = 'other',      'Khác'
 
 
 class ListingType(models.TextChoices):
@@ -17,10 +16,10 @@ class ListingType(models.TextChoices):
 
 
 class PropertyStatus(models.TextChoices):
-    AVAILABLE = 'available', 'Còn trống'
-    SOLD      = 'sold',      'Đã bán'
-    RENTED    = 'rented',    'Đã cho thuê'
-    PENDING   = 'pending',   'Đang chờ'
+    ACTIVE     = 'active',   'Đang hoạt động'
+    INACTIVE   = 'inactive', 'Không hoạt động'
+    SOLD       = 'sold',     'Đã bán'
+    RENTED     = 'rented',   'Đã cho thuê'
 
 
 class Property(models.Model):
@@ -28,9 +27,9 @@ class Property(models.Model):
     owner        = models.ForeignKey(User, on_delete=models.CASCADE, related_name='properties', verbose_name='Chủ sở hữu')
     title        = models.CharField(max_length=255, verbose_name='Tiêu đề')
     description  = models.TextField(verbose_name='Mô tả')
-    property_type = models.CharField(max_length=20, choices=PropertyType.choices, verbose_name='Loại BĐS')
-    listing_type  = models.CharField(max_length=10, choices=ListingType.choices, verbose_name='Hình thức')
-    status       = models.CharField(max_length=20, choices=PropertyStatus.choices, default=PropertyStatus.AVAILABLE, verbose_name='Trạng thái')
+    property_type = models.CharField(max_length=20, choices=PropertyType.choices, default=PropertyType.HOUSE, verbose_name='Loại BĐS')
+    listing_type  = models.CharField(max_length=10, choices=ListingType.choices, default=ListingType.FOR_SALE, verbose_name='Hình thức')
+    status       = models.CharField(max_length=20, choices=PropertyStatus.choices, default=PropertyStatus.ACTIVE, verbose_name='Trạng thái')
 
     # Giá cả
     price        = models.DecimalField(max_digits=15, decimal_places=0, verbose_name='Giá (VNĐ)')
@@ -38,14 +37,14 @@ class Property(models.Model):
 
     # Diện tích & thông số
     area         = models.DecimalField(max_digits=10, decimal_places=2, verbose_name='Diện tích (m²)')
-    bedrooms     = models.PositiveSmallIntegerField(default=0, verbose_name='Số phòng ngủ')
-    bathrooms    = models.PositiveSmallIntegerField(default=0, verbose_name='Số phòng tắm')
-    floors       = models.PositiveSmallIntegerField(default=1, verbose_name='Số tầng')
+    bedrooms     = models.PositiveSmallIntegerField(null=True, blank=True, verbose_name='Số phòng ngủ')
+    bathrooms    = models.PositiveSmallIntegerField(null=True, blank=True, verbose_name='Số phòng tắm')
+    floors       = models.PositiveSmallIntegerField(null=True, blank=True, verbose_name='Số tầng')
 
     # Địa chỉ
-    province     = models.CharField(max_length=100, verbose_name='Tỉnh/Thành phố')
-    district     = models.CharField(max_length=100, verbose_name='Quận/Huyện')
-    ward         = models.CharField(max_length=100, blank=True, verbose_name='Phường/Xã')
+    city         = models.CharField(max_length=100, verbose_name='Tỉnh/Thành phố')
+    district     = models.CharField(max_length=100, null=True, blank=True, verbose_name='Quận/Huyện')
+    ward         = models.CharField(max_length=100, null=True, blank=True, verbose_name='Phường/Xã')
     address      = models.CharField(max_length=255, verbose_name='Địa chỉ cụ thể')
     latitude     = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)
     longitude    = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)

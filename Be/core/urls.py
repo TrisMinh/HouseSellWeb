@@ -39,6 +39,8 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/auth/', include('accounts.urls')),       # Xác thực
     path('api/properties/', include('properties.urls')),  # BĐS
+    path('api/appointments/', include('appointments.urls')), # Lịch hẹn
+    path('api/news/', include('news.urls')),              # Tin tức
     path('api/prediction/', include('prediction.urls')),  # Dự đoán giá nhà
 
     # Swagger API Docs

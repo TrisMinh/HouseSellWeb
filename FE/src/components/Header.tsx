@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Menu, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -22,6 +23,7 @@ const navLinks = [
 ];
 
 export const Header = () => {
+  const { user, isLoggedIn, logout } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isVisible, setIsVisible] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
@@ -74,47 +76,58 @@ export const Header = () => {
               ))}
             </nav>
 
-            {/* User Profile Dropdown */}
-            <div className="hidden sm:flex items-center">
-              <DropdownMenu modal={false}>
-                <DropdownMenuTrigger asChild>
-                  <div className="flex items-center gap-3 cursor-pointer hover:bg-black/5 p-2 rounded-xl transition-all select-none outline-none">
-                    <Avatar className="h-10 w-10 border border-border">
-                      <AvatarImage src="https://github.com/shadcn.png" alt="User" />
-                      <AvatarFallback>CN</AvatarFallback>
-                    </Avatar>
-                    <span className="font-medium text-lg">John Doe</span>
-                  </div>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-56 mt-2">
-                  <DropdownMenuLabel>My Account</DropdownMenuLabel>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem 
-                    className="cursor-pointer"
-                    onClick={() => window.location.href = '/profile'}
-                  >
-                    Profile
-                  </DropdownMenuItem>
-                  <DropdownMenuItem 
-                    className="cursor-pointer"
-                    onClick={() => window.location.href = '/your-info'}
-                  >
-                    Settings
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem className="cursor-pointer text-red-600 focus:text-red-600">
-                    Logout
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </div>
-
-            {/* Sign In Button */}
-            <a href="/login" className="hidden sm:block">
-              <Button className="rounded-xl px-5 py-4 h-auto text-xl font-medium bg-black text-white hover:bg-black/80 shadow-md hover:shadow-lg transition-all">
-                Sign in
-              </Button>
-            </a>
+            {/* Conditional User Profile / Sign In */}
+            {isLoggedIn ? (
+              <div className="hidden sm:flex items-center">
+                <DropdownMenu modal={false}>
+                  <DropdownMenuTrigger asChild>
+                    <div className="flex items-center gap-3 cursor-pointer hover:bg-black/5 p-2 rounded-xl transition-all select-none outline-none">
+                      <Avatar className="h-10 w-10 border border-border">
+                        <AvatarImage src={user?.avatar || "https://github.com/shadcn.png"} alt="User" />
+                        <AvatarFallback>{(user?.first_name?.[0] || user?.username?.[0] || 'U').toUpperCase()}</AvatarFallback>
+                      </Avatar>
+                      <span className="font-medium text-lg">
+                        {user?.first_name || user?.last_name 
+                          ? `${user.first_name || ''} ${user.last_name || ''}`.trim() 
+                          : user?.username || 'User'}
+                      </span>
+                    </div>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-56 mt-2">
+                    <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem 
+                      className="cursor-pointer"
+                      onClick={() => window.location.href = '/profile'}
+                    >
+                      Profile
+                    </DropdownMenuItem>
+                    <DropdownMenuItem 
+                      className="cursor-pointer"
+                      onClick={() => window.location.href = '/your-info'}
+                    >
+                      Settings
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem 
+                      className="cursor-pointer text-red-600 focus:text-red-600"
+                      onClick={async () => {
+                        await logout();
+                        window.location.href = '/';
+                      }}
+                    >
+                      Logout
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
+            ) : (
+              <a href="/login" className="hidden sm:block">
+                <Button className="rounded-xl px-5 py-4 h-auto text-xl font-medium bg-black text-white hover:bg-black/80 shadow-md hover:shadow-lg transition-all">
+                  Sign in
+                </Button>
+              </a>
+            )}
 
             {/* Mobile Menu Button */}
             <button
@@ -148,13 +161,35 @@ export const Header = () => {
                 </a>
               ))}
               <div className="h-px bg-border my-2" />
-              <a 
-                href="/login"
-                className="px-4 py-3 rounded-lg text-lg font-medium hover:bg-accent transition-colors text-primary"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                Sign in
-              </a>
+              {isLoggedIn ? (
+                <>
+                  <a 
+                    href="/profile"
+                    className="px-4 py-3 rounded-lg text-lg font-medium hover:bg-accent transition-colors"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    Profile
+                  </a>
+                  <button
+                    className="px-4 py-3 rounded-lg text-lg font-medium hover:bg-accent transition-colors text-red-600 text-left w-full"
+                    onClick={async () => {
+                      setMobileMenuOpen(false);
+                      await logout();
+                      window.location.href = '/';
+                    }}
+                  >
+                    Logout
+                  </button>
+                </>
+              ) : (
+                <a 
+                  href="/login"
+                  className="px-4 py-3 rounded-lg text-lg font-medium hover:bg-accent transition-colors text-primary"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  Sign in
+                </a>
+              )}
             </nav>
           </motion.div>
         )}
