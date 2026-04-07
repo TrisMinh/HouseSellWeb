@@ -1,0 +1,21 @@
+# Python
+**/__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Django runtime artifacts
+Be/db.sqlite3
+Be/media/
+
+# Frontend
+FE/node_modules/
+FE/dist/
+
+# Local/editor
+.vscode/
+.idea/
+
+# Dataset/cache artifacts
+LinearRegressionModel/data/vietnam-real-estates/.cache/
+

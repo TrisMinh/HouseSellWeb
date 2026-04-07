@@ -1,0 +1,493 @@
+{
+    "Phường Nghĩa Đô, Quận Cầu Giấy, Hà Nội": {
+        "lat": 21.0418032,
+        "lng": 105.7865134
+    },
+    "Phường Kim Giang, Quận Thanh Xuân, Hà Nội": null,
+    "Phường Minh Khai, Quận Hai Bà Trưng, Hà Nội": null,
+    "Phường Thụy Khuê, Quận Tây Hồ, Hà Nội": {
+        "lat": 21.0415858,
+        "lng": 105.8215908
+    },
+    "Phường Yên Hoà, Quận Cầu Giấy, Hà Nội": null,
+    "Phường Trung Liệt, Quận Đống Đa, Hà Nội": null,
+    "Phường Đống Mác, Quận Hai Bà Trưng, Hà Nội": null,
+    "Phường Xuân La, Quận Tây Hồ, Hà Nội": {
+        "lat": 21.0641291,
+        "lng": 105.8068399
+    },
+    "Phường Văn Quán, Quận Hà Đông, Hà Nội": {
+        "lat": 20.9741308,
+        "lng": 105.7868191
+    },
+    "Huyện Thanh Trì, Hà Nội": {
+        "lat": 20.9415559,
+        "lng": 105.8360164
+    },
+    "Phường Định Công, Quận Hoàng Mai, Hà Nội": null,
+    "Phường Bồ Đề, Quận Long Biên, Hà Nội": {
+        "lat": 21.0364751,
+        "lng": 105.8778886
+    },
+    "Phường Quang Trung, Quận Hà Đông, Hà Nội": {
+        "lat": 20.9721687,
+        "lng": 105.7765642
+    },
+    "Phường Thanh Lương, Quận Hai Bà Trưng, Hà Nội": null,
+    "Phường Khương Trung, Quận Thanh Xuân, Hà Nội": null,
+    "Phường Phúc Tân, Quận Hoàn Kiếm, Hà Nội": {
+        "lat": 21.03648,
+        "lng": 105.8542595
+    },
+    "Phường Gia Thụy, Quận Long Biên, Hà Nội": null,
+    "Phường Khương Đình, Quận Thanh Xuân, Hà Nội": null,
+    "Phường Phương Canh, Quận Nam Từ Liêm, Hà Nội": {
+        "lat": 21.032865,
+        "lng": 105.7416196
+    },
+    "Phường Tương Mai, Quận Hoàng Mai, Hà Nội": null,
+    "Phường La Khê, Quận Hà Đông, Hà Nội": null,
+    "Phường Mễ Trì, Quận Nam Từ Liêm, Hà Nội": null,
+    "Phường Khương Mai, Quận Thanh Xuân, Hà Nội": null,
+    "Phường Láng Hạ, Quận Đống Đa, Hà Nội": {
+        "lat": 21.0212424,
+        "lng": 105.8100297
+    },
+    "Phường Quan Hoa, Quận Cầu Giấy, Hà Nội": {
+        "lat": 21.0361576,
+        "lng": 105.8015505
+    },
+    "Phường Tây Mỗ, Quận Nam Từ Liêm, Hà Nội": {
+        "lat": 21.0031898,
+        "lng": 105.7508212
+    },
+    "Phường Ngọc Khánh, Quận Ba Đình, Hà Nội": {
+        "lat": 21.0291095,
+        "lng": 105.8115454
+    },
+    "Phường Đại Mỗ, Quận Nam Từ Liêm, Hà Nội": {
+        "lat": 20.9962479,
+        "lng": 105.7829269
+    },
+    "Phường Mỹ Đình 1, Quận Nam Từ Liêm, Hà Nội": {
+        "lat": 21.0205027,
+        "lng": 105.7639271
+    },
+    "Phường Cống Vị, Quận Ba Đình, Hà Nội": null,
+    "Phường Bách Khoa, Quận Hai Bà Trưng, Hà Nội": null,
+    "Phường Vĩnh Phúc, Quận Ba Đình, Hà Nội": null,
+    "Huyện Hoài Đức, Hà Nội": {
+        "lat": 21.0228962,
+        "lng": 105.7035484
+    },
+    "Phường Đại Kim, Quận Hoàng Mai, Hà Nội": null,
+    "Phường Mai Động, Quận Hoàng Mai, Hà Nội": null,
+    "Phường Trung Tự, Quận Đống Đa, Hà Nội": null,
+    "Phường Kiến Hưng, Quận Hà Đông, Hà Nội": null,
+    "Phường Trúc Bạch, Quận Ba Đình, Hà Nội": {
+        "lat": 21.0478774,
+        "lng": 105.8422406
+    },
+    "Phường Cổ Nhuế 1, Quận Bắc Từ Liêm, Hà Nội": {
+        "lat": 21.0451915,
+        "lng": 105.7861662
+    },
+    "Phường Đức Giang, Quận Long Biên, Hà Nội": {
+        "lat": 21.0695094,
+        "lng": 105.9046593
+    },
+    "Phường Mỹ Đình 2, Quận Nam Từ Liêm, Hà Nội": null,
+    "Phường Bưởi, Quận Tây Hồ, Hà Nội": null,
+    "Phường Ô Chợ Dừa, Quận Đống Đa, Hà Nội": null,
+    "Phường Long Biên, Quận Long Biên, Hà Nội": {
+        "lat": 21.0180529,
+        "lng": 105.9016988
+    },
+    "Phường Hoàng Văn Thụ, Quận Hoàng Mai, Hà Nội": null,
+    "Phường Mai Dịch, Quận Cầu Giấy, Hà Nội": {
+        "lat": 21.0421414,
+        "lng": 105.781475
+    },
+    "Phường Nhân Chính, Quận Thanh Xuân, Hà Nội": null,
+    "Phường Vạn Phúc, Quận Hà Đông, Hà Nội": null,
+    "Phường Ngọc Hà, Quận Ba Đình, Hà Nội": {
+        "lat": 21.0403138,
+        "lng": 105.8219721
+    },
+    "Phường Lĩnh Nam, Quận Hoàng Mai, Hà Nội": null,
+    "Phường Xuân Đỉnh, Quận Bắc Từ Liêm, Hà Nội": null,
+    "Phường Phú Đô, Quận Nam Từ Liêm, Hà Nội": null,
+    "Phường Liễu Giai, Quận Ba Đình, Hà Nội": null,
+    "Huyện Đan Phượng, Hà Nội": {
+        "lat": 21.119409,
+        "lng": 105.6788843
+    },
+    "Phường Kim Liên, Quận Đống Đa, Hà Nội": null,
+    "Phường Phúc Diễn, Quận Bắc Từ Liêm, Hà Nội": null,
+    "Phường Kim Mã, Quận Ba Đình, Hà Nội": null,
+    "Phường Trung Phụng, Quận Đống Đa, Hà Nội": null,
+    "Phường Tân Mai, Quận Hoàng Mai, Hà Nội": null,
+    "Phường Ngã Tư Sở, Quận Đống Đa, Hà Nội": null,
+    "Phường Trung Văn, Quận Nam Từ Liêm, Hà Nội": null,
+    "Phường Thượng Đình, Quận Thanh Xuân, Hà Nội": null,
+    "Quận Hoàng Mai, Hà Nội": {
+        "lat": 20.975392,
+        "lng": 105.8573399
+    },
+    "Phường Minh Khai, Quận Bắc Từ Liêm, Hà Nội": {
+        "lat": 21.0446809,
+        "lng": 105.7417518
+    },
+    "Phường Thịnh Liệt, Quận Hoàng Mai, Hà Nội": null,
+    "Phường Quốc Tử Giám, Quận Đống Đa, Hà Nội": {
+        "lat": 21.0281354,
+        "lng": 105.838589
+    },
+    "Phường Khâm Thiên, Quận Đống Đa, Hà Nội": null,
+    "Phường Trương Định, Quận Hai Bà Trưng, Hà Nội": null,
+    "Phường Phú Diễn, Quận Bắc Từ Liêm, Hà Nội": {
+        "lat": 21.0563409,
+        "lng": 105.7470725
+    },
+    "Phường Thạch Bàn, Quận Long Biên, Hà Nội": {
+        "lat": 21.0180529,
+        "lng": 105.9016988
+    },
+    "Phường Ngọc Thụy, Quận Long Biên, Hà Nội": {
+        "lat": 21.0438263,
+        "lng": 105.86562
+    },
+    "Phường Cầu Dền, Quận Hai Bà Trưng, Hà Nội": null,
+    "Phường Phú Lương, Quận Hà Đông, Hà Nội": null,
+    "Phường Bạch Đằng, Quận Hai Bà Trưng, Hà Nội": null,
+    "Phường Phú La, Quận Hà Đông, Hà Nội": null,
+    "Phường Hà Cầu, Quận Hà Đông, Hà Nội": {
+        "lat": 21.0398796,
+        "lng": 105.8051121
+    },
+    "Phường Láng Thượng, Quận Đống Đa, Hà Nội": null,
+    "Phường Phương Liệt, Quận Thanh Xuân, Hà Nội": {
+        "lat": 20.9973524,
+        "lng": 105.8383941
+    },
+    "Phường Vĩnh Hưng, Quận Hoàng Mai, Hà Nội": null,
+    "Phường Thanh Nhàn, Quận Hai Bà Trưng, Hà Nội": null,
+    "Phường Cự Khối, Quận Long Biên, Hà Nội": {
+        "lat": 21.0099172,
+        "lng": 105.9047681
+    },
+    "Quận Ba Đình, Hà Nội": {
+        "lat": 21.0347091,
+        "lng": 105.8245193
+    },
+    "Phường Thịnh Quang, Quận Đống Đa, Hà Nội": null,
+    "Phường Trung Hoà, Quận Cầu Giấy, Hà Nội": null,
+    "Phường Quỳnh Mai, Quận Hai Bà Trưng, Hà Nội": null,
+    "Phường Nam Đồng, Quận Đống Đa, Hà Nội": null,
+    "Phường Dịch Vọng Hậu, Quận Cầu Giấy, Hà Nội": {
+        "lat": 21.0388103,
+        "lng": 105.7818897
+    },
+    "Phường Nghĩa Tân, Quận Cầu Giấy, Hà Nội": {
+        "lat": 21.0435605,
+        "lng": 105.7887379
+    },
+    "Huyện Thanh Oai, Hà Nội": {
+        "lat": 20.8634475,
+        "lng": 105.7610252
+    },
+    "Phường Vĩnh Tuy, Quận Hai Bà Trưng, Hà Nội": null,
+    "Phường Quảng An, Quận Tây Hồ, Hà Nội": null,
+    "Phường Yên Nghĩa, Quận Hà Đông, Hà Nội": null,
+    "Phường Đội Cấn, Quận Ba Đình, Hà Nội": {
+        "lat": 21.0343738,
+        "lng": 105.8306015
+    },
+    "Phường Thành Công, Quận Ba Đình, Hà Nội": null,
+    "Phường Giáp Bát, Quận Hoàng Mai, Hà Nội": null,
+    "Phường Dịch Vọng, Quận Cầu Giấy, Hà Nội": {
+        "lat": 21.0352138,
+        "lng": 105.7924703
+    },
+    "Phường Quang Trung, Quận Đống Đa, Hà Nội": null,
+    "Phường Thanh Xuân Bắc, Quận Thanh Xuân, Hà Nội": {
+        "lat": 21.0412566,
+        "lng": 105.751144
+    },
+    "Phường Phương Mai, Quận Đống Đa, Hà Nội": null,
+    "Phường Bạch Mai, Quận Hai Bà Trưng, Hà Nội": null,
+    "Phường Thanh Trì, Quận Hoàng Mai, Hà Nội": null,
+    "Phường Thượng Thanh, Quận Long Biên, Hà Nội": {
+        "lat": 21.0180529,
+        "lng": 105.9016988
+    },
+    "Phường Trần Phú, Quận Hoàng Mai, Hà Nội": null,
+    "Phường Nguyễn Trãi, Quận Hà Đông, Hà Nội": null,
+    "Phường Dương Nội, Quận Hà Đông, Hà Nội": {
+        "lat": 20.9614029,
+        "lng": 105.7633591
+    },
+    "Phường Hạ Đình, Quận Thanh Xuân, Hà Nội": {
+        "lat": 21.0398998,
+        "lng": 105.8475957
+    },
+    "Phường Thanh Xuân Nam, Quận Thanh Xuân, Hà Nội": {
+        "lat": 21.0380687,
+        "lng": 105.7466523
+    },
+    "Quận Tây Hồ, Hà Nội": {
+        "lat": 21.0682703,
+        "lng": 105.8239615
+    },
+    "Huyện Sóc Sơn, Hà Nội": {
+        "lat": 21.256018,
+        "lng": 105.8496735
+    },
+    "Phường Phố Huế, Quận Hai Bà Trưng, Hà Nội": null,
+    "Phường Đồng Tâm, Quận Hai Bà Trưng, Hà Nội": null,
+    "Phường Xuân Phương, Quận Nam Từ Liêm, Hà Nội": {
+        "lat": 21.0380687,
+        "lng": 105.7466523
+    },
+    "Phường Phạm Đình Hổ, Quận Hai Bà Trưng, Hà Nội": null,
+    "Phường Ngọc Lâm, Quận Long Biên, Hà Nội": null,
+    "Phường Mộ Lao, Quận Hà Đông, Hà Nội": null,
+    "Phường Phú Thượng, Quận Tây Hồ, Hà Nội": {
+        "lat": 21.0791733,
+        "lng": 105.815656
+    },
+    "Phường Việt Hưng, Quận Long Biên, Hà Nội": {
+        "lat": 21.0695094,
+        "lng": 105.9046593
+    },
+    "Phường Đông Ngạc, Quận Bắc Từ Liêm, Hà Nội": {
+        "lat": 21.069798,
+        "lng": 105.7744412
+    },
+    "Phường Thổ Quan, Quận Đống Đa, Hà Nội": null,
+    "Phường Lê Đại Hành, Quận Hai Bà Trưng, Hà Nội": null,
+    "Phường Khương Thượng, Quận Đống Đa, Hà Nội": null,
+    "Phường Cầu Diễn, Quận Nam Từ Liêm, Hà Nội": null,
+    "Phường Phú Lãm, Quận Hà Đông, Hà Nội": null,
+    "Huyện Gia Lâm, Hà Nội": {
+        "lat": 21.0237594,
+        "lng": 105.9397851
+    },
+    "Phường Biên Giang, Quận Hà Đông, Hà Nội": null,
+    "Phường Hàng Bột, Quận Đống Đa, Hà Nội": null,
+    "Quận Nam Từ Liêm, Hà Nội": {
+        "lat": 21.0185679,
+        "lng": 105.7576128
+    },
+    "Phường Cổ Nhuế 2, Quận Bắc Từ Liêm, Hà Nội": {
+        "lat": 21.0478335,
+        "lng": 105.7835054
+    },
+    "Quận Long Biên, Hà Nội": {
+        "lat": 21.036727,
+        "lng": 105.898499
+    },
+    "Phường Giảng Võ, Quận Ba Đình, Hà Nội": {
+        "lat": 21.0291095,
+        "lng": 105.8115454
+    },
+    "Huyện Chương Mỹ, Hà Nội": {
+        "lat": 20.92366,
+        "lng": 105.7016985
+    },
+    "Phường Cát Linh, Quận Đống Đa, Hà Nội": null,
+    "Phường Quỳnh Lôi, Quận Hai Bà Trưng, Hà Nội": null,
+    "Quận Cầu Giấy, Hà Nội": {
+        "lat": 21.0298464,
+        "lng": 105.7913272
+    },
+    "Phường Yên Sở, Quận Hoàng Mai, Hà Nội": null,
+    "Phường Hoàng Liệt, Quận Hoàng Mai, Hà Nội": null,
+    "Quận Hai Bà Trưng, Hà Nội": {
+        "lat": 21.005453,
+        "lng": 105.8606225
+    },
+    "Phường Yết Kiêu, Quận Hà Đông, Hà Nội": null,
+    "Phường Cửa Đông, Quận Hoàn Kiếm, Hà Nội": {
+        "lat": 21.031926,
+        "lng": 105.8445575
+    },
+    "Quận Thanh Xuân, Hà Nội": {
+        "lat": 20.994215,
+        "lng": 105.8193007
+    },
+    "Phường Giang Biên, Quận Long Biên, Hà Nội": {
+        "lat": 21.0630178,
+        "lng": 105.9180118
+    },
+    "Quận Hà Đông, Hà Nội": {
+        "lat": 20.9540708,
+        "lng": 105.7600855
+    },
+    "Phường Chương Dương, Quận Hoàn Kiếm, Hà Nội": null,
+    "Phường Phúc La, Quận Hà Đông, Hà Nội": null,
+    "Phường Phúc Đồng, Quận Long Biên, Hà Nội": {
+        "lat": 21.0365344,
+        "lng": 105.903586
+    },
+    "Phường Thượng Cát, Quận Bắc Từ Liêm, Hà Nội": null,
+    "Phường Phúc Xá, Quận Ba Đình, Hà Nội": null,
+    "Phường Văn Chương, Quận Đống Đa, Hà Nội": null,
+    "Quận Đống Đa, Hà Nội": {
+        "lat": 21.0145101,
+        "lng": 105.8234093
+    },
+    "Phường Thanh Xuân Trung, Quận Thanh Xuân, Hà Nội": {
+        "lat": 21.0180529,
+        "lng": 105.9016988
+    },
+    "Phường Phương Liên, Quận Đống Đa, Hà Nội": null,
+    "Phường Nhật Tân, Quận Tây Hồ, Hà Nội": null,
+    "Phường Sài Đồng, Quận Long Biên, Hà Nội": {
+        "lat": 21.0365344,
+        "lng": 105.903586
+    },
+    "Huyện Đông Anh, Hà Nội": {
+        "lat": 21.140558,
+        "lng": 105.8466733
+    },
+    "Phường Văn Miếu, Quận Đống Đa, Hà Nội": {
+        "lat": 21.0281354,
+        "lng": 105.838589
+    },
+    "Phường Quán Thánh, Quận Ba Đình, Hà Nội": {
+        "lat": 21.030548,
+        "lng": 105.8403281
+    },
+    "Phường Phúc Lợi, Quận Long Biên, Hà Nội": {
+        "lat": 21.0460973,
+        "lng": 105.9177576
+    },
+    "Phường Vĩnh Tuy, Quận Hai Bà Trưng, Hà Nội": null,
+    "Phường Đồng Nhân, Quận Hai Bà Trưng, Hà Nội": null,
+    "Phường Ngô Thì Nhậm, Quận Hai Bà Trưng, Hà Nội": null,
+    "Phường Đồng Mai, Quận Hà Đông, Hà Nội": {
+        "lat": 21.0421414,
+        "lng": 105.781475
+    },
+    "Phường Liên Mạc, Quận Bắc Từ Liêm, Hà Nội": null,
+    "Phường Bùi Thị Xuân, Quận Hai Bà Trưng, Hà Nội": null,
+    "Phường Xuân Tảo, Quận Bắc Từ Liêm, Hà Nội": null,
+    "Phường Yên Phụ, Quận Tây Hồ, Hà Nội": null,
+    "Phường Thụy Phương, Quận Bắc Từ Liêm, Hà Nội": null,
+    "Phường Hàng Bông, Quận Hoàn Kiếm, Hà Nội": null,
+    "Huyện Thường Tín, Hà Nội": {
+        "lat": 20.8708029,
+        "lng": 105.862067
+    },
+    "Phường Nguyễn Du, Quận Hai Bà Trưng, Hà Nội": null,
+    "Phường Tứ Liên, Quận Tây Hồ, Hà Nội": null,
+    "Phường Phan Chu Trinh, Quận Hoàn Kiếm, Hà Nội": null,
+    "Phường Cửa Nam, Quận Hoàn Kiếm, Hà Nội": {
+        "lat": 21.031926,
+        "lng": 105.8445575
+    },
+    "Quận Bắc Từ Liêm, Hà Nội": {
+        "lat": 21.0730119,
+        "lng": 105.7613958
+    },
+    "Phường Hàng Bồ, Quận Hoàn Kiếm, Hà Nội": null,
+    "Phường Điện Biên, Quận Ba Đình, Hà Nội": {
+        "lat": 21.030548,
+        "lng": 105.8403281
+    },
+    "Phường Ngô Quyền, Thị xã Sơn Tây, Hà Nội": null,
+    "Phường Trần Hưng Đạo, Quận Hoàn Kiếm, Hà Nội": null,
+    "Phường Hàng Bài, Quận Hoàn Kiếm, Hà Nội": null,
+    "Phường Nam Đồng, Quận Đống Đa, Hà Nội": null,
+    "Phường Đức Thắng, Quận Bắc Từ Liêm, Hà Nội": null,
+    "Phường Tràng Tiền, Quận Hoàn Kiếm, Hà Nội": {
+        "lat": 21.0254884,
+        "lng": 105.8559784
+    },
+    "Phường Hàng Bạc, Quận Hoàn Kiếm, Hà Nội": null,
+    "Phường Hàng Đào, Quận Hoàn Kiếm, Hà Nội": null,
+    "Quận Hoàn Kiếm, Hà Nội": {
+        "lat": 21.0307816,
+        "lng": 105.8540626
+    },
+    "Phường Đồng Xuân, Quận Hoàn Kiếm, Hà Nội": {
+        "lat": 21.0398034,
+        "lng": 105.8477526
+    },
+    "Phường Lý Thái Tổ, Quận Hoàn Kiếm, Hà Nội": {
+        "lat": 21.0288837,
+        "lng": 105.8566691
+    },
+    "Phường Hàng Buồm, Quận Hoàn Kiếm, Hà Nội": null,
+    "Huyện Mê Linh, Hà Nội": {
+        "lat": 21.1822074,
+        "lng": 105.7218568
+    },
+    "Phường Hàng Trống, Quận Hoàn Kiếm, Hà Nội": null,
+    "Phường Hàng Mã, Quận Hoàn Kiếm, Hà Nội": {
+        "lat": 21.0397584,
+        "lng": 105.8473362
+    },
+    "Phường Nguyễn Trung Trực, Quận Ba Đình, Hà Nội": null,
+    "Huyện Quốc Oai, Hà Nội": {
+        "lat": 20.990517,
+        "lng": 105.639533
+    },
+    "Phường Bưởi, Quận Ba Đình, Hà Nội": null,
+    "Phường Phú Thịnh, Thị xã Sơn Tây, Hà Nội": null,
+    "Huyện Phúc Thọ, Hà Nội": {
+        "lat": 21.1042893,
+        "lng": 105.5446784
+    },
+    "Huyện Phú Xuyên, Hà Nội": {
+        "lat": 20.7249007,
+        "lng": 105.9208978
+    },
+    "Phường Tây Tựu, Quận Bắc Từ Liêm, Hà Nội": {
+        "lat": 21.0563409,
+        "lng": 105.7470725
+    },
+    "Huyện Ba Vì, Hà Nội": {
+        "lat": 21.1998493,
+        "lng": 105.4233197
+    },
+    "Thị xã Sơn Tây, Hà Nội": {
+        "lat": 21.1404505,
+        "lng": 105.5021468
+    },
+    "Phường Ngọc Hà Ba Đình Thành Phố Hà Nội, Quận Ba Đình, Hà Nội": {
+        "lat": 21.0415858,
+        "lng": 105.8215908
+    },
+    "Huyện Thạch Thất, Hà Nội": {
+        "lat": 21.0467687,
+        "lng": 105.5822141
+    },
+    "Phường Viên Sơn, Thị xã Sơn Tây, Hà Nội": null,
+    "Phường Trung Sơn Trầm, Thị xã Sơn Tây, Hà Nội": null,
+    "Phường Hàng Gai, Quận Hoàn Kiếm, Hà Nội": null,
+    "Phường Xuân Khanh, Thị xã Sơn Tây, Hà Nội": null,
+    ", Hà Nội": {
+        "lat": 21.0283334,
+        "lng": 105.854041
+    },
+    "Phường Vĩnh Hưng Hoàng M, Quận Hoàng Mai, Hà Nội": null,
+    "Huyện Mỹ Đức, Hà Nội": {
+        "lat": 20.6866968,
+        "lng": 105.7444567
+    },
+    "Phường Thanh Nhàn, Quận Hai Bà Trưng, Hà Nội": null,
+    "Phường Bạch Mai, Quận Hai Bà Trưng, Hà Nội": null,
+    "Phường Đống Mác, Quận Hai Bà Trưng, Hà Nội": null,
+    "Phường Bách Khoa, Quận Hai Bà Trưng, Hà Nội": null,
+    "Phường Đồng Tâm, Quận Hai Bà Trưng, Hà Nội": null,
+    "Phường Nguyễn Du, Quận Hai Bà Trưng, Hà Nội": null,
+    "Phường Bạch Đằng, Quận Hai Bà Trưng, Hà Nội": null,
+    "Phường Quỳnh Lôi, Quận Hai Bà Trưng, Hà Nội": null,
+    "Phường Láng Hạ, Quận Đống Đa, Hà Nội": {
+        "lat": 21.0212424,
+        "lng": 105.8100297
+    },
+    "Phường Phố Huế, Quận Hai Bà Trưng, Hà Nội": null
+}

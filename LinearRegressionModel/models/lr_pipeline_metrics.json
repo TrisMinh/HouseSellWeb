@@ -1,0 +1,15 @@
+{
+  "mae": 9237683605.863203,
+  "rmse": 16591262348.540613,
+  "r2": 0.2733119808433506,
+  "train_rows": 200000,
+  "test_rows": 50000,
+  "features": [
+    "property_type_name",
+    "province_name",
+    "area",
+    "floor_count",
+    "bedroom_count",
+    "bathroom_count"
+  ]
+}

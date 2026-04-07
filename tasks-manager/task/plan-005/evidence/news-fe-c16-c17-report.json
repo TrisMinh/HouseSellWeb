@@ -1,0 +1,11 @@
+{
+  "C16": {
+    "pass": true,
+    "featuredVisible": true,
+    "secondaryVisible": true
+  },
+  "C17": {
+    "pass": true,
+    "fallbackVisible": true
+  }
+}
