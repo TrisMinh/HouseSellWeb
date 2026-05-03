@@ -1,12 +1,13 @@
 import { useEffect, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { ArrowLeft, Award, BriefcaseBusiness, Clock3, Loader2, Mail, MapPin, Phone, ShieldCheck, Star } from "lucide-react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@/contexts/AuthContext";
 import { getAgentInitials } from "@/lib/agentProfile";
-import { AgentDetail as AgentDetailType, getAgent } from "@/lib/agentsApi";
+import { AgentDetail as AgentDetailType, deleteAgent, getAgent, revokeAgentVerification } from "@/lib/agentsApi";
 
 const statCards = (agent: AgentDetailType) => [
   {
@@ -37,9 +38,13 @@ const statCards = (agent: AgentDetailType) => [
 
 const AgentDetail = () => {
   const { slug } = useParams<{ slug: string }>();
+  const navigate = useNavigate();
+  const { user } = useAuth();
   const [agent, setAgent] = useState<AgentDetailType | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [actionError, setActionError] = useState("");
+  const [adminLoading, setAdminLoading] = useState<"revoke" | "delete" | null>(null);
 
   useEffect(() => {
     if (!slug) return;
@@ -49,6 +54,7 @@ const AgentDetail = () => {
     const loadAgent = async () => {
       setLoading(true);
       setError("");
+      setActionError("");
 
       try {
         const data = await getAgent(slug);
@@ -74,6 +80,37 @@ const AgentDetail = () => {
       cancelled = true;
     };
   }, [slug]);
+
+  const handleRevokeVerification = async () => {
+    if (!agent || !window.confirm(`Remove verification for ${agent.full_name}?`)) return;
+
+    try {
+      setAdminLoading("revoke");
+      setActionError("");
+      await revokeAgentVerification(agent.slug);
+      setAgent((prev) => (prev ? { ...prev, is_verified: false } : prev));
+    } catch (actionError) {
+      console.error("Failed to revoke verification:", actionError);
+      setActionError("Could not remove agent verification.");
+    } finally {
+      setAdminLoading(null);
+    }
+  };
+
+  const handleDeleteAgent = async () => {
+    if (!agent || !window.confirm(`Delete ${agent.full_name} permanently?`)) return;
+
+    try {
+      setAdminLoading("delete");
+      setActionError("");
+      await deleteAgent(agent.slug);
+      navigate("/agents", { replace: true });
+    } catch (actionError) {
+      console.error("Failed to delete agent:", actionError);
+      setActionError("Could not delete this agent.");
+      setAdminLoading(null);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-[#F8FAFB] font-sans">
@@ -146,22 +183,49 @@ const AgentDetail = () => {
                     </div>
                   </div>
 
-                  <div className="flex flex-wrap gap-3">
-                    {agent.email && (
-                      <Button asChild className="rounded-full bg-sky-700 hover:bg-sky-800 text-white px-6 cursor-pointer">
-                        <a href={`mailto:${agent.email}`}>
-                          <Mail className="w-4 h-4 mr-2" />
-                          Email agent
-                        </a>
-                      </Button>
-                    )}
-                    {agent.phone && (
-                      <Button asChild variant="outline" className="rounded-full px-6 cursor-pointer">
-                        <a href={`tel:${agent.phone}`}>
-                          <Phone className="w-4 h-4 mr-2" />
-                          Call agent
-                        </a>
-                      </Button>
+                  <div className="space-y-3">
+                    <div className="flex flex-wrap gap-3">
+                      {agent.email && (
+                        <Button asChild className="rounded-full bg-sky-700 hover:bg-sky-800 text-white px-6 cursor-pointer">
+                          <a href={`mailto:${agent.email}`}>
+                            <Mail className="w-4 h-4 mr-2" />
+                            Email agent
+                          </a>
+                        </Button>
+                      )}
+                      {agent.phone && (
+                        <Button asChild variant="outline" className="rounded-full px-6 cursor-pointer">
+                          <a href={`tel:${agent.phone}`}>
+                            <Phone className="w-4 h-4 mr-2" />
+                            Call agent
+                          </a>
+                        </Button>
+                      )}
+                    </div>
+                    {user?.is_staff && (
+                      <div className="space-y-3">
+                        <div className="flex flex-wrap gap-3">
+                          <Button
+                            variant="outline"
+                            className="rounded-full px-6 cursor-pointer border-amber-300 text-amber-700 hover:bg-amber-50"
+                            disabled={adminLoading !== null || !agent.is_verified}
+                            onClick={handleRevokeVerification}
+                          >
+                            {adminLoading === "revoke" ? "Removing..." : "Remove Verification"}
+                          </Button>
+                          <Button
+                            variant="destructive"
+                            className="rounded-full px-6 cursor-pointer"
+                            disabled={adminLoading !== null}
+                            onClick={handleDeleteAgent}
+                          >
+                            {adminLoading === "delete" ? "Deleting..." : "Delete Agent"}
+                          </Button>
+                        </div>
+                        {actionError && (
+                          <p className="text-sm text-rose-600 font-medium">{actionError}</p>
+                        )}
+                      </div>
                     )}
                   </div>
                 </div>

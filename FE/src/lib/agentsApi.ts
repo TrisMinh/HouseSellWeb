@@ -64,3 +64,12 @@ export const getAgent = async (slug: string): Promise<AgentDetail> => {
   const { data } = await api.get<AgentDetail>(`/api/agents/${slug}/`);
   return normalizeAgent(data);
 };
+
+export const revokeAgentVerification = async (slug: string): Promise<{ message: string }> => {
+  const { data } = await api.post<{ message: string }>(`/api/agents/${slug}/revoke-verification/`);
+  return data;
+};
+
+export const deleteAgent = async (slug: string): Promise<void> => {
+  await api.delete(`/api/agents/${slug}/delete/`);
+};

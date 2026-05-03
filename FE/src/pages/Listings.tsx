@@ -18,7 +18,13 @@ import { Pagination } from '@/components/listings/Pagination';
 import { LOCATIONS } from '@/data/locations';
 import { VIETNAM_PROVINCES } from '@/data/provinces';
 import { cn } from '@/lib/utils';
-import { getImageUrl, getProperties, normalizeListResponse, Property } from '@/lib/propertiesApi';
+import {
+  getImageUrl,
+  getProperties,
+  ListResponse,
+  normalizeListResponse,
+  Property,
+} from '@/lib/propertiesApi';
 
 type ViewMode = 'grid' | 'list';
 type SortBy = 'newest' | 'price-asc' | 'price-desc';
@@ -42,7 +48,7 @@ interface ListingViewModel {
   longitude: number | null;
 }
 
-const ITEMS_PER_PAGE = 30;
+const ITEMS_PER_PAGE = 24;
 
 const normalizeLocationValue = (value: string): string =>
   value
@@ -120,7 +126,7 @@ const Listings = () => {
     window.scrollTo({ top: 0, left: 0, behavior: 'instant' as ScrollBehavior });
   }, []);
 
-  const [allListings, setAllListings] = useState<ListingViewModel[]>([]);
+  const [pageListings, setPageListings] = useState<ListingViewModel[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [selectedListing, setSelectedListing] = useState<ListingViewModel | null>(null);
@@ -141,44 +147,6 @@ const Listings = () => {
       district: initial.district,
     };
   });
-
-  useEffect(() => {
-    let mounted = true;
-    const fetchListings = async () => {
-      setLoading(true);
-      setError('');
-      try {
-        const response = await getProperties();
-        const items = normalizeListResponse(response);
-        const mapped = items.map(mapPropertyToListing);
-        if (mounted) {
-          setAllListings(mapped);
-        }
-      } catch (_err) {
-        if (mounted) {
-          const err = _err as {
-            response?: { status?: number };
-            code?: string;
-          };
-          const statusCode = err.response?.status;
-          const nextMessage = statusCode
-            ? `Khong tai duoc danh sach bat dong san tu he thong (HTTP ${statusCode}).`
-            : 'Khong tai duoc danh sach bat dong san tu he thong. Kiem tra backend, API URL hoac CORS.';
-          setError(nextMessage);
-          setAllListings([]);
-        }
-      } finally {
-        if (mounted) {
-          setLoading(false);
-        }
-      }
-    };
-
-    fetchListings();
-    return () => {
-      mounted = false;
-    };
-  }, []);
 
   useEffect(() => {
     const next = getLocationLabelFromSlug(
@@ -208,10 +176,9 @@ const Listings = () => {
   const cityOptions = useMemo(() => {
     return dedupeLocations([
       ...VIETNAM_PROVINCES.map((item) => item.name),
-      ...allListings.map((item) => item.city).filter(Boolean),
       ...LOCATIONS.map((item) => item.city),
     ]);
-  }, [allListings]);
+  }, []);
 
   const districtOptions = useMemo(() => {
     if (!filters.city) return [];
@@ -220,50 +187,76 @@ const Listings = () => {
     const fallback = LOCATIONS.find((item) => normalizeLocationValue(item.city) === normalizedCity);
 
     return dedupeLocations([
-      ...allListings
-        .filter((item) => normalizeLocationValue(item.city) === normalizedCity)
-        .map((item) => item.district)
-        .filter(Boolean) as string[],
       ...(province?.locations.map((item) => item.name) ?? []),
       ...(fallback?.districts ?? []),
     ]);
-  }, [allListings, filters.city]);
+  }, [filters.city]);
 
-  const filteredListings = useMemo(() => {
-    const [minPriceBillion, maxPriceBillion] = filters.priceRange;
-    const listingTypeValue = filters.listingType === 'buy' ? 'sale' : 'rent';
-    const normalizedCity = normalizeLocationValue(filters.city);
-    const normalizedDistrict = normalizeLocationValue(filters.district);
+  useEffect(() => {
+    let mounted = true;
 
-    return allListings.filter((item) => {
-      const priceBillion = item.rawPrice / 1_000_000_000;
-      if (item.listingType !== listingTypeValue) return false;
-      if (priceBillion < minPriceBillion || priceBillion > maxPriceBillion) return false;
-      if (filters.city && normalizeLocationValue(item.city) !== normalizedCity) return false;
-      if (filters.district && normalizeLocationValue(item.district) !== normalizedDistrict) return false;
-      if (filters.propertyTypes.length > 0 && !filters.propertyTypes.includes(item.propertyType)) return false;
-      return true;
-    });
-  }, [allListings, filters]);
+    const fetchListings = async () => {
+      setLoading(true);
+      setError('');
+      try {
+        const [minPriceBillion, maxPriceBillion] = filters.priceRange;
+        const listingTypeValue = filters.listingType === 'buy' ? 'sale' : 'rent';
+        const ordering =
+          sortBy === 'price-asc'
+            ? 'price'
+            : sortBy === 'price-desc'
+              ? '-price'
+              : '-created_at';
 
-  const sortedListings = useMemo(() => {
-    const cloned = [...filteredListings];
-    if (sortBy === 'price-asc') {
-      cloned.sort((a, b) => a.rawPrice - b.rawPrice);
-      return cloned;
-    }
-    if (sortBy === 'price-desc') {
-      cloned.sort((a, b) => b.rawPrice - a.rawPrice);
-      return cloned;
-    }
-    return cloned;
-  }, [filteredListings, sortBy]);
+        const response = await getProperties({
+          listing_type: listingTypeValue,
+          city: filters.city || undefined,
+          district: filters.district || undefined,
+          property_type: filters.propertyTypes.length > 0 ? filters.propertyTypes.join(',') : undefined,
+          price_min: Math.max(0, Math.round(minPriceBillion * 1_000_000_000)),
+          price_max: Math.max(0, Math.round(maxPriceBillion * 1_000_000_000)),
+          ordering,
+          page: currentPage,
+          page_size: ITEMS_PER_PAGE,
+        });
 
-  const totalResults = sortedListings.length;
+        const items = normalizeListResponse(response);
+        const mapped = items.map(mapPropertyToListing);
+        const responseCount = Array.isArray(response)
+          ? mapped.length
+          : (response as Extract<ListResponse<Property>, { count: number }>).count;
+
+        if (mounted) {
+          setPageListings(mapped);
+          setTotalResults(responseCount);
+        }
+      } catch (_err) {
+        if (mounted) {
+          const err = _err as {
+            response?: { status?: number };
+          };
+          const statusCode = err.response?.status;
+          const nextMessage = statusCode
+            ? `Could not load property listings from the system (HTTP ${statusCode}).`
+            : 'Could not load property listings from the system. Check backend, API URL, or CORS.';
+          setError(nextMessage);
+          setPageListings([]);
+          setTotalResults(0);
+        }
+      } finally {
+        if (mounted) {
+          setLoading(false);
+        }
+      }
+    };
+
+    fetchListings();
+    return () => {
+      mounted = false;
+    };
+  }, [currentPage, filters, sortBy]);
+
   const totalPages = Math.max(1, Math.ceil(totalResults / ITEMS_PER_PAGE));
-  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-  const endIndex = startIndex + ITEMS_PER_PAGE;
-  const paginatedListings = sortedListings.slice(startIndex, endIndex);
 
   useEffect(() => {
     setCurrentPage(1);
@@ -277,11 +270,11 @@ const Listings = () => {
 
   useEffect(() => {
     if (!selectedListing) return;
-    const exists = sortedListings.some((item) => item.id === selectedListing.id);
+    const exists = pageListings.some((item) => item.id === selectedListing.id);
     if (!exists) {
       setSelectedListing(null);
     }
-  }, [selectedListing, sortedListings]);
+  }, [pageListings, selectedListing]);
 
   return (
     <div className="min-h-screen bg-[#F6F7F9]">
@@ -416,7 +409,7 @@ const Listings = () => {
                     },
                   }}
                 >
-                  {paginatedListings.map((listing) => (
+                  {pageListings.map((listing) => (
                     <motion.div
                       key={listing.id}
                       variants={{
@@ -466,3 +459,4 @@ const Listings = () => {
 };
 
 export default Listings;
+  const [totalResults, setTotalResults] = useState(0);

@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -66,11 +67,22 @@ export const FeaturedListings = () => {
     const fetchFeaturedListings = async () => {
       setLoading(true);
       try {
-        const response = await getProperties({ ordering: '-created_at' });
-        const items = normalizeListResponse(response);
-        const mapped = items.map(toFeaturedItem);
-        const featuredPool = items.filter((item) => item.is_featured).map(toFeaturedItem);
-        const source = featuredPool.length > 0 ? featuredPool : mapped;
+        const featuredResponse = await getProperties({
+          ordering: '-created_at',
+          is_featured: true,
+          page_size: 12,
+        });
+        const featuredItems = normalizeListResponse(featuredResponse);
+
+        let source = featuredItems.map(toFeaturedItem);
+        if (source.length === 0) {
+          const fallbackResponse = await getProperties({
+            ordering: '-created_at',
+            page_size: 12,
+          });
+          const fallbackItems = normalizeListResponse(fallbackResponse);
+          source = fallbackItems.map(toFeaturedItem);
+        }
 
         if (mounted) {
           setListings(source.slice(0, 12));
@@ -106,10 +118,10 @@ export const FeaturedListings = () => {
             <h2 className="mb-2">Featured Listings</h2>
             <p className="text-muted-foreground">Discover the most popular real estate listings</p>
           </div>
-          <a href="/listings" className="text-accent font-medium flex items-center gap-1 hover:gap-2 transition-all">
+          <Link to="/listings" className="text-accent font-medium flex items-center gap-1 hover:gap-2 transition-all">
             View all
             <ChevronRight className="w-5 h-5" />
-          </a>
+          </Link>
         </div>
 
         <div className="flex flex-wrap gap-2 mb-8">
@@ -126,12 +138,15 @@ export const FeaturedListings = () => {
 
         {loading ? (
           <div className="text-muted-foreground py-10">Loading featured listings...</div>
+        ) : filteredListings.length === 0 ? (
+          <div className="card-elevated p-8 text-center text-muted-foreground">
+            No featured listings are available right now.
+          </div>
         ) : (
           <motion.div
             className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
             initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: '-100px' }}
+            animate="visible"
             variants={{
               hidden: { opacity: 0 },
               visible: {
