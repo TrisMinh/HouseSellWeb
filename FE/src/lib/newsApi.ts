@@ -23,8 +23,13 @@ export interface CreateNewsPayload {
 
 export type NewsListResponse = PaginatedResponse<NewsItem> | NewsItem[];
 
-export const getNewsList = async (): Promise<NewsListResponse> => {
-  const { data } = await api.get<NewsListResponse>('/api/news/');
+export interface NewsListParams {
+  page?: number;
+  page_size?: number;
+}
+
+export const getNewsList = async (params?: NewsListParams): Promise<NewsListResponse> => {
+  const { data } = await api.get<NewsListResponse>('/api/news/', { params });
   return data;
 };
 

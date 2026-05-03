@@ -2,18 +2,43 @@ import { useState, useMemo, useEffect } from 'react';
 import { X, Calendar, Clock, ChevronRight, CheckCircle2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import { format, addDays } from 'date-fns';
+import { addDays, format } from 'date-fns';
+import type { PropertyAvailabilityDay } from '@/lib/propertiesApi';
 
 export interface ScheduleModalProps {
     isOpen: boolean;
     onClose: () => void;
     onSchedule: (date: Date, isCustom: boolean, selectedTime?: string) => void;
     propertyName?: string;
+    availabilitySchedule?: PropertyAvailabilityDay[];
 }
 
-const AVAILABLE_TIME_SLOTS = ["09:00", "10:30", "14:00", "15:30", "17:00"];
+const addOneHour = (time: string) => {
+    const [hour, minute] = time.split(':').map(Number);
+    const endHour = hour + 1;
+    return `${String(endHour).padStart(2, '0')}:${String(minute).padStart(2, '0')}`;
+};
 
-export const ScheduleModal = ({ isOpen, onClose, onSchedule, propertyName }: ScheduleModalProps) => {
+const expandScheduleSlots = (dayName: string, schedule?: PropertyAvailabilityDay[]) => {
+    const day = schedule?.find((item) => item.dayOfWeek.toLowerCase() === dayName.toLowerCase() && item.enabled);
+    if (!day || !day.slots.length) return [];
+
+    const expanded = new Set<string>();
+    day.slots.forEach((slot) => {
+        if (!slot.start || !slot.end) return;
+        let cursor = slot.start;
+        while (cursor < slot.end) {
+            expanded.add(cursor);
+            const next = addOneHour(cursor);
+            if (next <= cursor) break;
+            cursor = next;
+        }
+    });
+
+    return Array.from(expanded).sort();
+};
+
+export const ScheduleModal = ({ isOpen, onClose, onSchedule, propertyName, availabilitySchedule }: ScheduleModalProps) => {
     const [selectedDateIndex, setSelectedDateIndex] = useState(0);
     const [selectedTime, setSelectedTime] = useState<string | null>(null);
     const [isProposingCustom, setIsProposingCustom] = useState(false);
@@ -36,6 +61,18 @@ export const ScheduleModal = ({ isOpen, onClose, onSchedule, propertyName }: Sch
     const next7Days = useMemo(() => {
         return Array.from({ length: 7 }).map((_, i) => addDays(new Date(), i));
     }, []);
+
+    const hasConfiguredAvailability = useMemo(() => {
+        return Boolean(availabilitySchedule?.some((day) => day.enabled && day.slots.length > 0));
+    }, [availabilitySchedule]);
+
+    const availableTimeSlots = useMemo(() => {
+        const selectedDay = next7Days[selectedDateIndex];
+        const dayName = format(selectedDay, 'EEEE');
+        const expanded = expandScheduleSlots(dayName, availabilitySchedule);
+        if (expanded.length > 0) return expanded;
+        return hasConfiguredAvailability ? [] : [];
+    }, [availabilitySchedule, hasConfiguredAvailability, next7Days, selectedDateIndex]);
 
     if (!isOpen) return null;
 
@@ -119,30 +156,32 @@ export const ScheduleModal = ({ isOpen, onClose, onSchedule, propertyName }: Sch
                             </h3>
 
                             {/* Time Slots Grid */}
-                            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-6">
-                                {AVAILABLE_TIME_SLOTS.map((time, idx) => {
-                                    // For realism, let's randomly disable some slots based on the day
-                                    // Make the middle slot always disabled on index 2 just for UI flair
-                                    const isDisabled = selectedDateIndex === 2 && idx === 1;
-                                    const isSelected = selectedTime === time;
+                            {availableTimeSlots.length > 0 ? (
+                                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-6">
+                                    {availableTimeSlots.map((time) => {
+                                        const isSelected = selectedTime === time;
 
-                                    return (
-                                        <button
-                                            key={time}
-                                            disabled={isDisabled}
-                                            onClick={() => setSelectedTime(time)}
-                                            className={cn(
-                                                "py-2.5 px-3 rounded-xl text-sm font-semibold transition-all border",
-                                                isDisabled && "opacity-40 bg-gray-50 border-gray-100 cursor-not-allowed",
-                                                !isDisabled && isSelected && "bg-primary text-white border-primary shadow-sm",
-                                                !isDisabled && !isSelected && "bg-white border-gray-200 hover:border-primary text-gray-700 hover:text-primary"
-                                            )}
-                                        >
-                                            {time}
-                                        </button>
-                                    );
-                                })}
-                            </div>
+                                        return (
+                                            <button
+                                                key={time}
+                                                onClick={() => setSelectedTime(time)}
+                                                className={cn(
+                                                    "py-2.5 px-3 rounded-xl text-sm font-semibold transition-all border",
+                                                    isSelected
+                                                        ? "bg-primary text-white border-primary shadow-sm"
+                                                        : "bg-white border-gray-200 hover:border-primary text-gray-700 hover:text-primary"
+                                                )}
+                                            >
+                                                {time}
+                                            </button>
+                                        );
+                                    })}
+                                </div>
+                            ) : (
+                                <div className="mb-6 rounded-2xl border border-dashed border-gray-200 bg-gray-50 px-4 py-6 text-sm text-gray-500">
+                                    No available time slots for this day.
+                                </div>
+                            )}
                         </div>
                     ) : (
                         <div className="animate-in fade-in slide-in-from-right-4 duration-300">

@@ -1,7 +1,9 @@
-import { X, Settings, Save, AlertCircle, Plus, Trash2 } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { Calendar, Clock, RotateCcw, Save, X } from "lucide-react";
+import { addDays, format } from "date-fns";
+
 import { Button } from "@/components/ui/button";
-import { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { cn } from "@/lib/utils";
 
 export interface TimeSlot {
   start: string;
@@ -21,209 +23,203 @@ interface GlobalAvailabilityModalProps {
   onClose: () => void;
   initialSchedule: AvailabilitySchedule;
   onSave: (schedule: AvailabilitySchedule) => void;
+  propertyName?: string;
 }
 
-export const GlobalAvailabilityModal = ({ isOpen, onClose, initialSchedule, onSave }: GlobalAvailabilityModalProps) => {
-  const [schedule, setSchedule] = useState<AvailabilitySchedule>(initialSchedule);
-  const [error, setError] = useState("");
+const TIME_OPTIONS = [
+  "08:00",
+  "09:00",
+  "10:00",
+  "11:00",
+  "12:00",
+  "13:00",
+  "14:00",
+  "15:00",
+  "16:00",
+  "17:00",
+  "18:00",
+  "19:00",
+];
 
-  // Reset state when modal opens
+const addOneHour = (time: string) => {
+  const [hour, minute] = time.split(":").map(Number);
+  return `${String(hour + 1).padStart(2, "0")}:${String(minute).padStart(2, "0")}`;
+};
+
+const normalizeSchedule = (schedule: AvailabilitySchedule): AvailabilitySchedule =>
+  schedule.map((day) => ({
+    ...day,
+    slots: [...day.slots].sort((a, b) => a.start.localeCompare(b.start)),
+  }));
+
+export const GlobalAvailabilityModal = ({
+  isOpen,
+  onClose,
+  initialSchedule,
+  onSave,
+  propertyName,
+}: GlobalAvailabilityModalProps) => {
+  const [schedule, setSchedule] = useState<AvailabilitySchedule>(initialSchedule);
+  const [selectedDayIndex, setSelectedDayIndex] = useState(0);
+
   useEffect(() => {
     if (isOpen) {
-      setSchedule(initialSchedule);
-      setError("");
+      setSchedule(normalizeSchedule(initialSchedule));
+      setSelectedDayIndex(0);
     }
-  }, [isOpen, initialSchedule]);
+  }, [initialSchedule, isOpen]);
+
+  const next7Days = useMemo(() => Array.from({ length: 7 }).map((_, index) => addDays(new Date(), index)), []);
 
   if (!isOpen) return null;
 
-  const handleDayToggle = (dayIndex: number) => {
-    const newSchedule = [...schedule];
-    newSchedule[dayIndex].enabled = !newSchedule[dayIndex].enabled;
-    // ensure at least 1 slot exists if turning on
-    if (newSchedule[dayIndex].enabled && newSchedule[dayIndex].slots.length === 0) {
-      newSchedule[dayIndex].slots = [{ start: "09:00", end: "17:00" }];
-    }
-    setSchedule(newSchedule);
+  const selectedDay = schedule[selectedDayIndex];
+
+  const hasSlot = (time: string) =>
+    selectedDay.slots.some((slot) => slot.start === time && slot.end === addOneHour(time));
+
+  const toggleTimeSlot = (time: string) => {
+    setSchedule((current) =>
+      current.map((day, index) => {
+        if (index !== selectedDayIndex) return day;
+
+        const nextSlot = { start: time, end: addOneHour(time) };
+        const exists = day.slots.some((slot) => slot.start === nextSlot.start && slot.end === nextSlot.end);
+        const nextSlots = exists
+          ? day.slots.filter((slot) => !(slot.start === nextSlot.start && slot.end === nextSlot.end))
+          : [...day.slots, nextSlot].sort((a, b) => a.start.localeCompare(b.start));
+
+        return {
+          ...day,
+          enabled: nextSlots.length > 0,
+          slots: nextSlots,
+        };
+      }),
+    );
   };
 
-  const handleAddSlot = (dayIndex: number) => {
-    const newSchedule = [...schedule];
-    newSchedule[dayIndex].slots.push({ start: "09:00", end: "17:00" });
-    setSchedule(newSchedule);
-  };
-
-  const handleRemoveSlot = (dayIndex: number, slotIndex: number) => {
-    const newSchedule = [...schedule];
-    newSchedule[dayIndex].slots.splice(slotIndex, 1);
-    
-    // Auto-disable day if last slot is removed
-    if (newSchedule[dayIndex].slots.length === 0) {
-      newSchedule[dayIndex].enabled = false;
-    }
-    setSchedule(newSchedule);
-  };
-
-  const handleTimeChange = (dayIndex: number, slotIndex: number, field: 'start' | 'end', value: string) => {
-    const newSchedule = [...schedule];
-    newSchedule[dayIndex].slots[slotIndex][field] = value;
-    setSchedule(newSchedule);
+  const resetSelectedDay = () => {
+    setSchedule((current) =>
+      current.map((day, index) =>
+        index === selectedDayIndex
+          ? {
+              ...day,
+              enabled: false,
+              slots: [],
+            }
+          : day,
+      ),
+    );
   };
 
   const handleSave = () => {
-    // Basic validation
-    let isValid = true;
-    let errorMessage = "";
-
-    schedule.forEach(day => {
-      if (day.enabled) {
-        day.slots.forEach(slot => {
-          if (!slot.start || !slot.end) {
-            isValid = false;
-            errorMessage = "Please fill in all time fields for enabled days.";
-          } else if (slot.start >= slot.end) {
-            isValid = false;
-            errorMessage = `End time must be after Start time on ${day.dayOfWeek}.`;
-          }
-        });
-      }
-    });
-
-    if (!isValid) {
-      setError(errorMessage);
-      return;
-    }
-
-    onSave(schedule);
+    onSave(normalizeSchedule(schedule));
     onClose();
   };
 
   return (
-    <AnimatePresence>
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm shadow-2xl">
-        <motion.div 
-          initial={{ opacity: 0, scale: 0.95, y: 10 }}
-          animate={{ opacity: 1, scale: 1, y: 0 }}
-          exit={{ opacity: 0, scale: 0.95, y: 10 }}
-          transition={{ duration: 0.2 }}
-          className="bg-white rounded-2xl shadow-xl w-full max-w-2xl overflow-hidden flex flex-col max-h-[90vh]"
-        >
-          {/* Header */}
-          <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 bg-slate-50/50 flex-shrink-0">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-blue-100 text-blue-700 rounded-lg">
-                <Settings className="w-5 h-5" />
-              </div>
-              <div>
-                <h2 className="text-xl font-bold font-['Inter'] text-slate-800">Global Availability</h2>
-                <p className="text-xs text-slate-500 font-medium">Configure daily schedules for buyer appointments</p>
-              </div>
-            </div>
-            <button 
-              onClick={onClose}
-              className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-full transition-colors"
-            >
-              <X className="w-6 h-6" />
-            </button>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 animate-in fade-in duration-200">
+      <div className="bg-white rounded-[28px] shadow-xl w-full max-w-[660px] overflow-hidden flex flex-col max-h-[90vh]">
+        <div className="p-6 border-b border-gray-100 flex items-center justify-between sticky top-0 bg-white z-10">
+          <div>
+            <h2 className="text-[2rem] font-bold font-['Inter'] text-gray-900 leading-none">Schedule Viewing</h2>
+            {propertyName && <p className="text-sm text-gray-500 mt-2 truncate max-w-[360px]">{propertyName}</p>}
           </div>
+          <button
+            onClick={onClose}
+            className="w-11 h-11 rounded-full bg-gray-50 hover:bg-gray-100 flex items-center justify-center transition-colors text-gray-500"
+          >
+            <X className="w-6 h-6" />
+          </button>
+        </div>
 
-          {/* Content */}
-          <div className="p-6 overflow-y-auto w-full">
-            {error && (
-              <div className="mb-6 p-4 bg-red-50 border border-red-100 text-red-700 text-sm font-semibold rounded-lg flex items-center gap-3">
-                <AlertCircle className="w-5 h-5 flex-shrink-0" />
-                {error}
-              </div>
-            )}
+        <div className="p-6 overflow-y-auto w-full flex-1 scrollbar-thin scrollbar-thumb-gray-200">
+          <div>
+            <h3 className="font-semibold text-[1rem] text-gray-700 mb-3 flex items-center gap-2">
+              <Calendar className="w-4 h-4 text-primary" />
+              Select a Day (Next 7 Days)
+            </h3>
 
-            <div className="space-y-4">
-              {schedule.map((day, dayIndex) => (
-                <div 
-                  key={day.dayOfWeek} 
-                  className={`border rounded-xl transition-all duration-200 ${day.enabled ? 'border-sky-200 bg-sky-50/20 shadow-sm' : 'border-slate-200 bg-slate-50/50 grayscale-[0.5] opacity-70'}`}
-                >
-                  <div className="p-4 flex items-center justify-between border-b border-slate-100/50">
-                    <div className="flex items-center gap-4">
-                      {/* Toggle Switch */}
-                      <button 
-                        onClick={() => handleDayToggle(dayIndex)}
-                        className={`w-11 h-6 rounded-full transition-colors relative ${day.enabled ? 'bg-[#0F766E]' : 'bg-slate-300'}`}
-                      >
-                        <div className={`w-4 h-4 rounded-full bg-white absolute top-1 transition-transform ${day.enabled ? 'left-6' : 'left-1'}`} />
-                      </button>
-                      
-                      <span className={`font-bold w-24 ${day.enabled ? 'text-slate-800' : 'text-slate-500'}`}>
-                        {day.dayOfWeek}
-                      </span>
-                    </div>
-
-                    {day.enabled && (
-                      <Button 
-                        onClick={() => handleAddSlot(dayIndex)}
-                        variant="ghost" 
-                        size="sm" 
-                        className="h-8 text-[#0F766E] font-bold hover:bg-[#0F766E]/10"
-                      >
-                        <Plus className="w-4 h-4 mr-1.5" />
-                        Add Slot
-                      </Button>
+            <div className="flex gap-3 overflow-x-auto pb-4 scrollbar-none snap-x">
+              {next7Days.map((date, index) => {
+                const isSelected = selectedDayIndex === index;
+                const scheduleDay = schedule[index];
+                return (
+                  <button
+                    key={scheduleDay.dayOfWeek}
+                    onClick={() => setSelectedDayIndex(index)}
+                    className={cn(
+                      "flex-shrink-0 snap-start flex flex-col items-center justify-center p-3 rounded-[26px] border-2 transition-all w-[88px]",
+                      isSelected
+                        ? "border-primary bg-primary/5 text-primary"
+                        : scheduleDay.enabled
+                          ? "border-emerald-200 bg-emerald-50/50 text-emerald-700"
+                          : "border-gray-100 hover:border-gray-200 bg-white text-gray-600",
                     )}
-                  </div>
+                  >
+                    <span className="text-xs font-semibold uppercase tracking-wider mb-1">{format(date, "EEE")}</span>
+                    <span className="text-[2rem] font-bold leading-none">{format(date, "d")}</span>
+                  </button>
+                );
+              })}
+            </div>
 
-                  {day.enabled && (
-                    <div className="p-4 space-y-3 bg-white/50 rounded-b-xl border-t border-slate-100">
-                      {day.slots.map((slot, slotIndex) => (
-                        <div key={slotIndex} className="flex flex-wrap items-end gap-4 p-3 border border-slate-100 bg-white rounded-lg shadow-sm">
-                          <div className="flex-1 min-w-[120px]">
-                            <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">Start Time</label>
-                            <input 
-                              type="time" 
-                              value={slot.start}
-                              onChange={(e) => handleTimeChange(dayIndex, slotIndex, 'start', e.target.value)}
-                              className="w-full px-3 py-2 bg-white border border-slate-300 rounded-md focus:ring-2 focus:ring-[#0F766E]/50 focus:border-[#0F766E] outline-none font-medium text-slate-700"
-                            />
-                          </div>
-                          <span className="text-slate-300 font-bold mb-3">-</span>
-                          <div className="flex-1 min-w-[120px]">
-                            <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">End Time</label>
-                            <input 
-                              type="time" 
-                              value={slot.end}
-                              onChange={(e) => handleTimeChange(dayIndex, slotIndex, 'end', e.target.value)}
-                              className="w-full px-3 py-2 bg-white border border-slate-300 rounded-md focus:ring-2 focus:ring-[#0F766E]/50 focus:border-[#0F766E] outline-none font-medium text-slate-700"
-                            />
-                          </div>
-                          
-                          <Button 
-                            variant="ghost" 
-                            size="icon" 
-                            onClick={() => handleRemoveSlot(dayIndex, slotIndex)}
-                            className="h-10 w-10 text-rose-500 hover:bg-rose-50 hover:text-rose-600 mb-0.5"
-                            title="Remove Slot"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </Button>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              ))}
+            <div className="mt-6 flex items-center justify-between gap-3">
+              <h3 className="font-semibold text-[1rem] text-gray-700 flex items-center gap-2">
+                <Clock className="w-4 h-4 text-primary" />
+                Available Times
+              </h3>
+
+              <button
+                type="button"
+                onClick={resetSelectedDay}
+                className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-800 transition-colors"
+              >
+                <RotateCcw className="w-4 h-4" />
+                Clear day
+              </button>
+            </div>
+
+            <p className="text-sm text-gray-400 mt-2 mb-4">
+              Click each 1-hour slot to mark when buyers are allowed to book this property.
+            </p>
+
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-6">
+              {TIME_OPTIONS.map((time) => {
+                const selected = hasSlot(time);
+                return (
+                  <button
+                    key={time}
+                    type="button"
+                    onClick={() => toggleTimeSlot(time)}
+                    className={cn(
+                      "py-3 px-3 rounded-xl text-sm font-semibold transition-all border",
+                      selected
+                        ? "bg-primary text-white border-primary shadow-sm"
+                        : "bg-white border-gray-200 hover:border-primary text-gray-700 hover:text-primary",
+                    )}
+                  >
+                    {time}
+                  </button>
+                );
+              })}
             </div>
           </div>
+        </div>
 
-          {/* Footer Actions */}
-          <div className="px-6 py-4 bg-slate-50 border-t border-slate-200 flex items-center justify-end gap-3 flex-shrink-0">
-            <Button variant="ghost" onClick={onClose} className="font-semibold text-slate-600 hover:text-slate-900 border border-slate-200">
-              Cancel
-            </Button>
-            <Button onClick={handleSave} className="bg-[#0F766E] hover:bg-[#0F766E]/90 text-white font-bold shadow-md px-6">
-              <Save className="w-4 h-4 mr-2" />
-              Save Availability Settings
-            </Button>
+        <div className="p-6 border-t border-gray-100 bg-gray-50/50 mt-auto flex flex-col gap-3">
+          <div className="text-sm text-muted-foreground text-center">
+            {selectedDay.enabled && selectedDay.slots.length > 0
+              ? `${selectedDay.dayOfWeek}: ${selectedDay.slots.map((slot) => slot.start).join(", ")}`
+              : `No time slot selected for ${selectedDay.dayOfWeek}.`}
           </div>
-        </motion.div>
+
+          <Button onClick={handleSave} className="w-full h-12 text-base font-bold">
+            <Save className="w-4 h-4 mr-2" />
+            Save Availability Settings
+          </Button>
+        </div>
       </div>
-    </AnimatePresence>
+    </div>
   );
 };

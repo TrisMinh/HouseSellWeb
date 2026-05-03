@@ -53,11 +53,11 @@ export const ListingCard = ({
       </div>
 
       <div className="p-4">
-        <div className="flex justify-between items-start mb-2">
-            <h3 className="font-semibold text-foreground text-sm line-clamp-1 flex-1 pr-2 group-hover:text-primary transition-colors">
+        <div className="mb-2 flex flex-col gap-1.5">
+            <h3 className="font-semibold text-foreground text-sm leading-snug break-words group-hover:text-primary transition-colors">
             {title}
             </h3>
-            <span className="text-primary font-bold text-sm whitespace-nowrap">{price}</span>
+            <span className="text-primary font-bold text-sm break-words">{price}</span>
         </div>
         
         <div className="flex items-center gap-1 text-muted-foreground text-xs mb-3">

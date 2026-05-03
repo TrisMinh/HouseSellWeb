@@ -64,6 +64,8 @@ class PropertyService:
             raise ValidationError({"order": ["Order phai >= 0."]})
 
         normalized_caption = (caption or "").strip()
+        if not normalized_caption:
+            raise ValidationError({"caption": ["Caption is required for every property image."]})
         if len(normalized_caption) > PropertyService.IMAGE_CAPTION_MAX_LENGTH:
             raise ValidationError(
                 {"caption": [f"Caption khong duoc vuot qua {PropertyService.IMAGE_CAPTION_MAX_LENGTH} ky tu."]}

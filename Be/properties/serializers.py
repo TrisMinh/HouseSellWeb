@@ -1,5 +1,9 @@
 from rest_framework import serializers
-from .models import Property, PropertyImage, Favorite
+
+from accounts.models import UserProfile
+from agents.models import Agent
+
+from .models import Favorite, Property, PropertyImage
 
 
 class PropertyImageSerializer(serializers.ModelSerializer):
@@ -11,6 +15,8 @@ class PropertyImageSerializer(serializers.ModelSerializer):
 class PropertyListSerializer(serializers.ModelSerializer):
     """Serializer nhẹ dùng cho danh sách (tốc độ)"""
     owner_name   = serializers.CharField(source='owner.get_full_name', read_only=True)
+    owner_phone = serializers.SerializerMethodField()
+    owner_agent_slug = serializers.SerializerMethodField()
     primary_image = serializers.SerializerMethodField()
     listing_type_display  = serializers.CharField(source='get_listing_type_display', read_only=True)
     property_type_display = serializers.CharField(source='get_property_type_display', read_only=True)
@@ -23,7 +29,7 @@ class PropertyListSerializer(serializers.ModelSerializer):
             'listing_type', 'listing_type_display', 'status', 'status_display',
             'price', 'area', 'bedrooms', 'bathrooms',
             'city', 'district', 'address',
-            'owner_name', 'primary_image', 'views_count', 'is_featured',
+            'owner_name', 'owner_phone', 'owner_agent_slug', 'primary_image', 'views_count', 'is_featured',
             'created_at',
         ]
 
@@ -34,12 +40,22 @@ class PropertyListSerializer(serializers.ModelSerializer):
             return request.build_absolute_uri(img.image.url) if request else img.image.url
         return None
 
+    def get_owner_phone(self, obj):
+        profile = UserProfile.objects.filter(user=obj.owner).only('phone').first()
+        return profile.phone if profile else None
+
+    def get_owner_agent_slug(self, obj):
+        agent = Agent.objects.filter(user=obj.owner).only('slug').first()
+        return agent.slug if agent else None
+
 
 class PropertyDetailSerializer(serializers.ModelSerializer):
     """Serializer đầy đủ dùng cho chi tiết"""
     images        = PropertyImageSerializer(many=True, read_only=True)
     owner_name    = serializers.CharField(source='owner.get_full_name', read_only=True)
     owner_username = serializers.CharField(source='owner.username', read_only=True)
+    owner_phone = serializers.SerializerMethodField()
+    owner_agent_slug = serializers.SerializerMethodField()
     listing_type_display  = serializers.CharField(source='get_listing_type_display', read_only=True)
     property_type_display = serializers.CharField(source='get_property_type_display', read_only=True)
     status_display        = serializers.CharField(source='get_status_display', read_only=True)
@@ -54,6 +70,14 @@ class PropertyDetailSerializer(serializers.ModelSerializer):
         if request and request.user.is_authenticated:
             return Favorite.objects.filter(user=request.user, property=obj).exists()
         return False
+
+    def get_owner_phone(self, obj):
+        profile = UserProfile.objects.filter(user=obj.owner).only('phone').first()
+        return profile.phone if profile else None
+
+    def get_owner_agent_slug(self, obj):
+        agent = Agent.objects.filter(user=obj.owner).only('slug').first()
+        return agent.slug if agent else None
 
 
 class PropertyCreateUpdateSerializer(serializers.ModelSerializer):

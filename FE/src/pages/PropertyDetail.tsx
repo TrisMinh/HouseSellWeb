@@ -6,7 +6,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Footer } from '@/components/Footer';
 import { Header } from '@/components/Header';
 import { Button } from '@/components/ui/button';
-import { Map, MapControls, MapMarker } from '@/components/ui/map';
+import { Map, MapControls, MapMarker, MarkerContent } from '@/components/ui/map';
 import { ScheduleModal } from '@/components/common/ScheduleModal';
 import {
   ArrowLeft,
@@ -162,21 +162,36 @@ const PropertyDetail = () => {
 
   const mapLat = toNumber(property?.latitude) ?? 10.7769;
   const mapLng = toNumber(property?.longitude) ?? 106.7009;
+  const availabilitySchedule = property?.availability_schedule ?? [];
 
   const detailRows = useMemo(() => {
     if (!property) return [];
-    return [
+    const rows = [
       { label: 'Property Type', value: property.property_type_display || property.property_type, icon: Building2 },
       { label: 'Listing Type', value: property.listing_type_display || property.listing_type, icon: Layers },
       { label: 'Status', value: property.status_display || property.status, icon: CheckCircle },
-      { label: 'Bedrooms', value: property.bedrooms ?? 'N/A', icon: Bed },
-      { label: 'Bathrooms', value: property.bathrooms ?? 'N/A', icon: Bath },
-      { label: 'Floors', value: property.floors ?? 'N/A', icon: Layers },
       { label: 'Area', value: `${property.area} m²`, icon: Maximize },
+      { label: 'Facing', value: property.facing || 'Not specified', icon: Compass },
+      { label: 'Legal', value: property.legal_status || 'Not specified', icon: Shield },
       { label: 'Address', value: property.address, icon: MapPin },
       { label: 'District', value: property.district || 'N/A', icon: Compass },
       { label: 'City', value: property.city, icon: Shield },
     ];
+
+    if (property.property_type !== 'land') {
+      rows.splice(
+        3,
+        0,
+        { label: 'Bedrooms', value: property.bedrooms ?? 'N/A', icon: Bed },
+        { label: 'Bathrooms', value: property.bathrooms ?? 'N/A', icon: Bath },
+        { label: 'Floors', value: property.floors ?? 'N/A', icon: Layers },
+        { label: 'Year Built', value: property.year_built ?? 'N/A', icon: CalendarCheck },
+        { label: 'Parking', value: property.parking_details || 'Not specified', icon: Building2 },
+        { label: 'Furniture', value: property.furniture_status || 'Not specified', icon: Building2 },
+      );
+    }
+
+    return rows;
   }, [property]);
 
   const features = useMemo(() => (property ? buildFeatureList(property) : []), [property]);
@@ -352,12 +367,12 @@ const PropertyDetail = () => {
                   </div>
                 </div>
 
-                <div className="flex gap-2">
-                  {galleryImages.slice(0, 4).map((img, index) => (
+                <div className="flex gap-2 overflow-x-auto pb-1">
+                  {galleryImages.map((img, index) => (
                     <button
                       key={img + index}
                       onClick={() => setActiveImage(index)}
-                      className={`relative rounded-xl overflow-hidden flex-1 h-20 cursor-pointer transition-all ${
+                      className={`relative rounded-xl overflow-hidden h-20 min-w-20 flex-shrink-0 cursor-pointer transition-all ${
                         activeImage === index ? 'ring-2 ring-teal-500 ring-offset-2' : 'opacity-70 hover:opacity-100'
                       }`}
                     >
@@ -373,16 +388,16 @@ const PropertyDetail = () => {
                 transition={{ duration: 0.4, delay: 0.1 }}
                 className="bg-white rounded-2xl border border-slate-100 p-6 md:p-8 mb-6"
               >
-                <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4 mb-4">
-                  <div className="flex-1">
+                <div className="flex flex-col gap-3 mb-4 md:flex-row md:items-start md:justify-between md:gap-6">
+                  <div className="min-w-0 flex-1">
                     <span className="inline-block text-xs font-bold px-3 py-1 rounded-full bg-teal-50 text-teal-700 mb-3">
                       {property.property_type_display || property.property_type}
                     </span>
-                    <h1 className="text-2xl md:text-3xl font-bold text-slate-900 font-['Inter'] leading-tight">
+                    <h1 className="text-2xl md:text-3xl font-bold text-slate-900 font-['Inter'] leading-tight break-words">
                       {property.title}
                     </h1>
                   </div>
-                  <p className="text-2xl md:text-3xl font-bold text-teal-700 font-['Inter'] whitespace-nowrap">
+                  <p className="text-xl md:text-3xl font-bold text-teal-700 font-['Inter'] md:whitespace-nowrap md:shrink-0">
                     {formatVndPrice(property.price)}
                   </p>
                 </div>
@@ -393,14 +408,18 @@ const PropertyDetail = () => {
                 </div>
 
                 <div className="flex flex-wrap gap-3">
-                  <div className="flex items-center gap-2 bg-slate-50 border border-slate-100 rounded-xl px-4 py-2.5">
-                    <Bed className="w-4 h-4 text-teal-600" />
-                    <span className="text-sm font-semibold text-slate-700">{property.bedrooms ?? 0} Bedrooms</span>
-                  </div>
-                  <div className="flex items-center gap-2 bg-slate-50 border border-slate-100 rounded-xl px-4 py-2.5">
-                    <Bath className="w-4 h-4 text-teal-600" />
-                    <span className="text-sm font-semibold text-slate-700">{property.bathrooms ?? 0} Bathrooms</span>
-                  </div>
+                  {property.property_type !== 'land' && (
+                    <>
+                      <div className="flex items-center gap-2 bg-slate-50 border border-slate-100 rounded-xl px-4 py-2.5">
+                        <Bed className="w-4 h-4 text-teal-600" />
+                        <span className="text-sm font-semibold text-slate-700">{property.bedrooms ?? 0} Bedrooms</span>
+                      </div>
+                      <div className="flex items-center gap-2 bg-slate-50 border border-slate-100 rounded-xl px-4 py-2.5">
+                        <Bath className="w-4 h-4 text-teal-600" />
+                        <span className="text-sm font-semibold text-slate-700">{property.bathrooms ?? 0} Bathrooms</span>
+                      </div>
+                    </>
+                  )}
                   <div className="flex items-center gap-2 bg-slate-50 border border-slate-100 rounded-xl px-4 py-2.5">
                     <Maximize className="w-4 h-4 text-teal-600" />
                     <span className="text-sm font-semibold text-slate-700">{property.area} m²</span>
@@ -477,7 +496,7 @@ const PropertyDetail = () => {
                     Property Photos
                   </h3>
                   <div className="space-y-4">
-                    {galleryImages.slice(0, 6).map((img, index) => (
+                    {galleryImages.map((img, index) => (
                       <div key={img + index} className="rounded-xl overflow-hidden border border-slate-100 group">
                         <img
                           src={img}
@@ -513,7 +532,9 @@ const PropertyDetail = () => {
                     className="w-full h-full"
                   >
                     <MapMarker longitude={mapLng} latitude={mapLat}>
-                      <div className="relative h-5 w-5 rounded-full border-[3px] border-white bg-teal-500 shadow-lg" />
+                      <MarkerContent>
+                        <div className="relative h-5 w-5 rounded-full border-[3px] border-white bg-teal-500 shadow-lg" />
+                      </MarkerContent>
                     </MapMarker>
                     <MapControls position="bottom-right" />
                   </Map>
@@ -580,19 +601,26 @@ const PropertyDetail = () => {
 
                   <div className="space-y-3">
                     <Button
+                      variant="outline"
+                      className="w-full h-12 text-base font-bold rounded-xl border-2 border-slate-200 hover:border-teal-200 hover:bg-teal-50 hover:text-teal-700 cursor-pointer"
+                      onClick={() => {
+                        if (property.owner_agent_slug) {
+                          navigate(`/agents/${property.owner_agent_slug}`);
+                          return;
+                        }
+                        setBookingError('This seller does not have a public agent profile yet.');
+                      }}
+                    >
+                      <MessageCircle className="w-5 h-5 mr-2" />
+                      Contact Agent
+                    </Button>
+                    <Button
                       onClick={handleOpenSchedule}
                       disabled={bookingLoading}
                       className="w-full h-12 text-base font-bold rounded-xl bg-teal-600 hover:bg-teal-700 cursor-pointer disabled:opacity-70"
                     >
                       <CalendarCheck className="w-5 h-5 mr-2" />
                       {bookingLoading ? 'Booking...' : 'Book Appointment'}
-                    </Button>
-                    <Button
-                      variant="outline"
-                      className="w-full h-12 text-base font-bold rounded-xl border-2 border-slate-200 hover:border-teal-200 hover:bg-teal-50 hover:text-teal-700 cursor-pointer"
-                    >
-                      <MessageCircle className="w-5 h-5 mr-2" />
-                      Contact
                     </Button>
                   </div>
                 </div>
@@ -609,6 +637,7 @@ const PropertyDetail = () => {
         onClose={() => setIsScheduleModalOpen(false)}
         onSchedule={handleSchedule}
         propertyName={property.title}
+        availabilitySchedule={availabilitySchedule}
       />
     </div>
   );

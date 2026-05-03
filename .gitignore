@@ -3,6 +3,8 @@
 *.pyc
 *.pyo
 *.pyd
+venv/
+**/venv/
 
 # Django runtime artifacts
 Be/db.sqlite3
@@ -15,7 +17,7 @@ FE/dist/
 # Local/editor
 .vscode/
 .idea/
+.env
 
 # Dataset/cache artifacts
 LinearRegressionModel/data/vietnam-real-estates/.cache/
-

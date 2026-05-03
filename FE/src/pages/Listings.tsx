@@ -1,6 +1,7 @@
 import { useEffect, useLayoutEffect, useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Check, ChevronDown, LayoutGrid, List } from 'lucide-react';
+import { useSearchParams } from 'react-router-dom';
 
 import { Footer } from '@/components/Footer';
 import { Header } from '@/components/Header';
@@ -14,6 +15,8 @@ import {
 import { ListingCard } from '@/components/listings/ListingCard';
 import { ListingRow } from '@/components/listings/ListingRow';
 import { Pagination } from '@/components/listings/Pagination';
+import { LOCATIONS } from '@/data/locations';
+import { VIETNAM_PROVINCES } from '@/data/provinces';
 import { cn } from '@/lib/utils';
 import { getImageUrl, getProperties, normalizeListResponse, Property } from '@/lib/propertiesApi';
 
@@ -40,6 +43,46 @@ interface ListingViewModel {
 }
 
 const ITEMS_PER_PAGE = 30;
+
+const normalizeLocationValue = (value: string): string =>
+  value
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/đ/g, 'd')
+    .replace(/Đ/g, 'D')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, ' ')
+    .trim();
+
+const dedupeLocations = (values: string[]): string[] => {
+  const seen = new Set<string>();
+  const deduped: string[] = [];
+
+  values.forEach((value) => {
+    const trimmed = value.trim();
+    if (!trimmed) return;
+    const normalized = normalizeLocationValue(trimmed);
+    if (!normalized || seen.has(normalized)) return;
+    seen.add(normalized);
+    deduped.push(trimmed);
+  });
+
+  return deduped.sort((a, b) => a.localeCompare(b, 'vi'));
+};
+
+const getLocationLabelFromSlug = (provinceSlug: string | null, locationSlug: string | null) => {
+  const province = provinceSlug
+    ? VIETNAM_PROVINCES.find((item) => item.slug === provinceSlug)
+    : undefined;
+  const district = province && locationSlug
+    ? province.locations.find((item) => item.slug === locationSlug)
+    : undefined;
+
+  return {
+    city: province?.name ?? '',
+    district: district?.name ?? '',
+  };
+};
 
 const formatVndPrice = (price: number): string => {
   if (!Number.isFinite(price)) return 'N/A';
@@ -71,6 +114,8 @@ const mapPropertyToListing = (property: Property): ListingViewModel => {
 };
 
 const Listings = () => {
+  const [searchParams] = useSearchParams();
+  const requestedType = searchParams.get('type') === 'rent' ? 'rent' : 'buy';
   useLayoutEffect(() => {
     window.scrollTo({ top: 0, left: 0, behavior: 'instant' as ScrollBehavior });
   }, []);
@@ -83,7 +128,19 @@ const Listings = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [sortBy, setSortBy] = useState<SortBy>('newest');
   const [showSortMenu, setShowSortMenu] = useState(false);
-  const [filters, setFilters] = useState<ListingFiltersState>(DEFAULT_LISTING_FILTERS);
+  const [filters, setFilters] = useState<ListingFiltersState>(() => {
+    const initial = getLocationLabelFromSlug(
+      searchParams.get('province'),
+      searchParams.get('location'),
+    );
+
+    return {
+      ...DEFAULT_LISTING_FILTERS,
+      listingType: requestedType,
+      city: initial.city,
+      district: initial.district,
+    };
+  });
 
   useEffect(() => {
     let mounted = true;
@@ -99,7 +156,15 @@ const Listings = () => {
         }
       } catch (_err) {
         if (mounted) {
-          setError('Khong tai duoc danh sach bat dong san tu he thong.');
+          const err = _err as {
+            response?: { status?: number };
+            code?: string;
+          };
+          const statusCode = err.response?.status;
+          const nextMessage = statusCode
+            ? `Khong tai duoc danh sach bat dong san tu he thong (HTTP ${statusCode}).`
+            : 'Khong tai duoc danh sach bat dong san tu he thong. Kiem tra backend, API URL hoac CORS.';
+          setError(nextMessage);
           setAllListings([]);
         }
       } finally {
@@ -115,34 +180,67 @@ const Listings = () => {
     };
   }, []);
 
-  const cityOptions = useMemo(() => {
-    return Array.from(new Set(allListings.map((item) => item.city).filter(Boolean))).sort((a, b) =>
-      a.localeCompare(b, 'vi'),
+  useEffect(() => {
+    const next = getLocationLabelFromSlug(
+      searchParams.get('province'),
+      searchParams.get('location'),
     );
+    const nextListingType = searchParams.get('type') === 'rent' ? 'rent' : 'buy';
+
+    setFilters((current) => {
+      if (
+        current.city === next.city &&
+        current.district === next.district &&
+        current.listingType === nextListingType
+      ) {
+        return current;
+      }
+
+      return {
+        ...current,
+        listingType: nextListingType,
+        city: next.city,
+        district: next.district,
+      };
+    });
+  }, [searchParams]);
+
+  const cityOptions = useMemo(() => {
+    return dedupeLocations([
+      ...VIETNAM_PROVINCES.map((item) => item.name),
+      ...allListings.map((item) => item.city).filter(Boolean),
+      ...LOCATIONS.map((item) => item.city),
+    ]);
   }, [allListings]);
 
   const districtOptions = useMemo(() => {
     if (!filters.city) return [];
-    return Array.from(
-      new Set(
-        allListings
-          .filter((item) => item.city === filters.city)
-          .map((item) => item.district)
-          .filter(Boolean),
-      ),
-    ).sort((a, b) => a.localeCompare(b, 'vi'));
+    const normalizedCity = normalizeLocationValue(filters.city);
+    const province = VIETNAM_PROVINCES.find((item) => normalizeLocationValue(item.name) === normalizedCity);
+    const fallback = LOCATIONS.find((item) => normalizeLocationValue(item.city) === normalizedCity);
+
+    return dedupeLocations([
+      ...allListings
+        .filter((item) => normalizeLocationValue(item.city) === normalizedCity)
+        .map((item) => item.district)
+        .filter(Boolean) as string[],
+      ...(province?.locations.map((item) => item.name) ?? []),
+      ...(fallback?.districts ?? []),
+    ]);
   }, [allListings, filters.city]);
 
   const filteredListings = useMemo(() => {
     const [minPriceBillion, maxPriceBillion] = filters.priceRange;
     const listingTypeValue = filters.listingType === 'buy' ? 'sale' : 'rent';
+    const normalizedCity = normalizeLocationValue(filters.city);
+    const normalizedDistrict = normalizeLocationValue(filters.district);
 
     return allListings.filter((item) => {
       const priceBillion = item.rawPrice / 1_000_000_000;
       if (item.listingType !== listingTypeValue) return false;
       if (priceBillion < minPriceBillion || priceBillion > maxPriceBillion) return false;
-      if (filters.city && item.city !== filters.city) return false;
-      if (filters.district && item.district !== filters.district) return false;
+      if (filters.city && normalizeLocationValue(item.city) !== normalizedCity) return false;
+      if (filters.district && normalizeLocationValue(item.district) !== normalizedDistrict) return false;
       if (filters.propertyTypes.length > 0 && !filters.propertyTypes.includes(item.propertyType)) return false;
       return true;
     });
@@ -207,7 +305,7 @@ const Listings = () => {
             />
           </motion.aside>
 
-          <div className="flex-1 min-w-0">
+          <div className="flex-1 min-w-0 flex flex-col">
             <div className="flex items-center justify-between mb-6">
               <p className="text-muted-foreground">
                 Showing <span className="font-semibold text-foreground">{totalResults}</span> results
@@ -296,7 +394,7 @@ const Listings = () => {
             )}
 
             {!loading && !error && (
-              <>
+              <div className="flex min-h-[calc(100vh-320px)] flex-col">
                 <motion.div
                   className={cn(
                     'pb-10 transition-all duration-300 ease-in-out',
@@ -347,10 +445,10 @@ const Listings = () => {
                   ))}
                 </motion.div>
 
-                <div className="mt-8">
+                <div className="mt-auto pt-8">
                   <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />
                 </div>
-              </>
+              </div>
             )}
           </div>
 

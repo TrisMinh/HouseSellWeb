@@ -3,6 +3,7 @@ import { useAuth } from '@/contexts/AuthContext';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
+  requireVerifiedSeller?: boolean;
 }
 
 /**
@@ -10,8 +11,8 @@ interface ProtectedRouteProps {
  * Nếu chưa đăng nhập → redirect về /login (và nhớ URL hiện tại để quay lại).
  * Nếu đang load → hiện spinner.
  */
-const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
-  const { isLoggedIn, loading } = useAuth();
+const ProtectedRoute = ({ children, requireVerifiedSeller = false }: ProtectedRouteProps) => {
+  const { isLoggedIn, loading, user } = useAuth();
   const location = useLocation();
 
   if (loading) {
@@ -25,6 +26,10 @@ const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
   if (!isLoggedIn) {
     // Lưu lại URL muốn vào để sau khi login có thể redirect đúng chỗ
     return <Navigate to="/login" state={{ from: location }} replace />;
+  }
+
+  if (requireVerifiedSeller && !user?.agent_is_verified) {
+    return <Navigate to="/profile" state={{ from: location, requiresVerification: true }} replace />;
   }
 
   return <>{children}</>;

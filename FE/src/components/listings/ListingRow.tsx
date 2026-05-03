@@ -55,11 +55,11 @@ export const ListingRow = ({
       <div className="flex-1 flex flex-col justify-between min-w-0">
         {/* Header */}
         <div>
-          <div className="flex justify-between items-start gap-4 mb-2">
-            <h3 className="font-semibold text-lg text-foreground leading-tight group-hover:text-primary transition-colors">
+          <div className="mb-2 flex flex-col gap-1.5 lg:flex-row lg:items-start lg:justify-between lg:gap-4">
+            <h3 className="font-semibold text-lg text-foreground leading-tight break-words group-hover:text-primary transition-colors">
               {title}
             </h3>
-            <span className="text-xl font-bold text-primary whitespace-nowrap flex-shrink-0">
+            <span className="text-xl font-bold text-primary break-words lg:flex-shrink-0 lg:whitespace-nowrap">
               {price}
             </span>
           </div>

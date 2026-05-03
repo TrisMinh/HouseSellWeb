@@ -4,7 +4,7 @@ import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Map, MapControls, MapMarker } from '@/components/ui/map';
+import { Map, MapControls, MapMarker, MarkerContent } from '@/components/ui/map';
 import {
   ArrowLeft,
   Bath,
@@ -281,11 +281,13 @@ const AppointmentDetail = () => {
                   <div className="h-72 w-full rounded-xl overflow-hidden border border-border mb-8">
                     <Map
                       viewport={{ center: [mapLng, mapLat], zoom: 13, bearing: 0, pitch: 0 }}
-                      className="w-full h-full"
-                    >
-                      <MapMarker longitude={mapLng} latitude={mapLat}>
+                    className="w-full h-full"
+                  >
+                    <MapMarker longitude={mapLng} latitude={mapLat}>
+                      <MarkerContent>
                         <div className="relative h-4 w-4 rounded-full border-2 border-white bg-blue-500 shadow-lg" />
-                      </MapMarker>
+                      </MarkerContent>
+                    </MapMarker>
                       <MapControls position="bottom-right" />
                     </Map>
                   </div>

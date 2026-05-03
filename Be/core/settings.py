@@ -63,6 +63,7 @@ INSTALLED_APPS = [
     'drf_yasg',
     'django_filters',                           # ← THÊM
     'accounts',
+    'agents',
     'properties',
     'appointments',
     'news',
@@ -181,12 +182,34 @@ LOGIN_URL = '/admin/login/'
 from datetime import timedelta
 
 # CORS - Cho phép FE (React) gọi API
+_default_dev_cors_origins = ','.join([
+    'http://localhost:3000',
+    'http://127.0.0.1:3000',
+    'http://localhost:4173',
+    'http://127.0.0.1:4173',
+    'http://localhost:5173',
+    'http://127.0.0.1:5173',
+    'http://localhost:8080',
+    'http://127.0.0.1:8080',
+])
 _cors_allowed_origins = os.getenv(
     'CORS_ALLOWED_ORIGINS',
-    'http://localhost:5173,http://127.0.0.1:5173,http://localhost:8080,http://127.0.0.1:8080'
+    _default_dev_cors_origins
 )
 CORS_ALLOWED_ORIGINS = [origin.strip() for origin in _cors_allowed_origins.split(',') if origin.strip()]
 CSRF_TRUSTED_ORIGINS = [origin.strip() for origin in _cors_allowed_origins.split(',') if origin.strip()]
+
+_cors_allowed_origin_regexes = os.getenv('CORS_ALLOWED_ORIGIN_REGEXES', '')
+CORS_ALLOWED_ORIGIN_REGEXES = [
+    pattern.strip() for pattern in _cors_allowed_origin_regexes.split(',') if pattern.strip()
+]
+
+if DEBUG:
+    CORS_ALLOWED_ORIGIN_REGEXES.extend([
+        r"^http://192\.168\.\d+\.\d+:(3000|4173|5173|8080)$",
+        r"^http://10\.\d+\.\d+\.\d+:(3000|4173|5173|8080)$",
+        r"^http://172\.(1[6-9]|2\d|3[0-1])\.\d+\.\d+:(3000|4173|5173|8080)$",
+    ])
 
 SWAGGER_PUBLIC = os.getenv('SWAGGER_PUBLIC', 'true' if DEBUG else 'false').lower() in ('1', 'true', 'yes')
 

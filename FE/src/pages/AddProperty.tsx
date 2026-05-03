@@ -1,13 +1,22 @@
 import { ChangeEvent, FormEvent, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { ImagePlus, Info } from 'lucide-react';
 
+import PropertyEditorFields from '@/components/properties/PropertyEditorFields';
 import { Footer } from '@/components/Footer';
 import { Header } from '@/components/Header';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import {
-  CreatePropertyPayload,
+  EMPTY_PROPERTY_FORM,
+  PropertyFormState,
+  PropertyTypeValue,
+  applyPropertyTypeRules,
+  buildPropertyPayload,
+} from '@/lib/propertyForm';
+import {
   createProperty,
+  deleteProperty,
   uploadPropertyImages,
 } from '@/lib/propertiesApi';
 
@@ -17,80 +26,6 @@ type LocalImage = {
   preview: string;
   caption: string;
   isPrimary: boolean;
-};
-
-type PropertyFormState = {
-  title: string;
-  description: string;
-  property_type: CreatePropertyPayload['property_type'];
-  listing_type: CreatePropertyPayload['listing_type'];
-  price: string;
-  area: string;
-  bedrooms: string;
-  bathrooms: string;
-  floors: string;
-  city: string;
-  district: string;
-  ward: string;
-  address: string;
-  latitude: string;
-  longitude: string;
-};
-
-const INITIAL_FORM: PropertyFormState = {
-  title: '',
-  description: '',
-  property_type: 'house',
-  listing_type: 'sale',
-  price: '',
-  area: '',
-  bedrooms: '',
-  bathrooms: '',
-  floors: '',
-  city: '',
-  district: '',
-  ward: '',
-  address: '',
-  latitude: '',
-  longitude: '',
-};
-
-const toNumberOrUndefined = (value: string): number | undefined => {
-  if (!value.trim()) return undefined;
-  const parsed = Number(value);
-  return Number.isFinite(parsed) ? parsed : undefined;
-};
-
-const buildPayload = (form: PropertyFormState): CreatePropertyPayload => {
-  const price = Number(form.price);
-  const area = Number(form.area);
-  if (!Number.isFinite(price) || price <= 0) {
-    throw new Error('Gia phai la so lon hon 0.');
-  }
-  if (!Number.isFinite(area) || area <= 0) {
-    throw new Error('Dien tich phai la so lon hon 0.');
-  }
-  if (!form.title.trim() || !form.city.trim() || !form.address.trim() || !form.description.trim()) {
-    throw new Error('Vui long dien day du cac truong bat buoc.');
-  }
-
-  return {
-    title: form.title.trim(),
-    description: form.description.trim(),
-    property_type: form.property_type,
-    listing_type: form.listing_type,
-    price,
-    area,
-    bedrooms: toNumberOrUndefined(form.bedrooms),
-    bathrooms: toNumberOrUndefined(form.bathrooms),
-    floors: toNumberOrUndefined(form.floors),
-    city: form.city.trim(),
-    district: form.district.trim() || undefined,
-    ward: form.ward.trim() || undefined,
-    address: form.address.trim(),
-    latitude: toNumberOrUndefined(form.latitude),
-    longitude: toNumberOrUndefined(form.longitude),
-  };
 };
 
 const getErrorMessage = (error: unknown): string => {
@@ -104,24 +39,36 @@ const getErrorMessage = (error: unknown): string => {
     if (Array.isArray(firstEntry) && firstEntry.length > 0) return String(firstEntry[0]);
     if (typeof firstEntry === 'string') return firstEntry;
   }
-  return 'Khong the tao bat dong san. Vui long thu lai.';
+  return 'Could not create the property listing. Please try again.';
 };
 
 const AddProperty = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  const [form, setForm] = useState<PropertyFormState>(INITIAL_FORM);
+  const [form, setForm] = useState<PropertyFormState>(EMPTY_PROPERTY_FORM);
   const [images, setImages] = useState<LocalImage[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const primaryImageId = useMemo(() => images.find((img) => img.isPrimary)?.id, [images]);
 
-  const handleInputChange =
-    (field: keyof PropertyFormState) =>
-    (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-      setForm((prev) => ({ ...prev, [field]: event.target.value }));
-    };
+  const updateField = (field: keyof PropertyFormState, value: string) => {
+    setForm((prev) => {
+      const next = { ...prev, [field]: value };
+      if (field === 'city') {
+        next.district = '';
+      }
+      return next;
+    });
+  };
+
+  const updateBooleanField = (field: keyof PropertyFormState, checked: boolean) => {
+    setForm((prev) => ({ ...prev, [field]: checked }));
+  };
+
+  const updatePropertyType = (value: PropertyTypeValue) => {
+    setForm((prev) => applyPropertyTypeRules(value, prev));
+  };
 
   const handleSelectImages = (event: ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(event.target.files || []);
@@ -171,10 +118,23 @@ const AddProperty = () => {
 
     try {
       setIsSubmitting(true);
-      const payload = buildPayload(form);
+      if (images.length < 4) {
+        throw new Error('Please upload at least 4 images: 1 primary image and 3 supporting images.');
+      }
+
+      if (!images.some((image) => image.isPrimary)) {
+        throw new Error('Please select one primary image.');
+      }
+
+      const missingCaption = images.find((image) => !image.caption.trim());
+      if (missingCaption) {
+        throw new Error('Every image must include a subtitle before creating the property.');
+      }
+
+      const payload = buildPropertyPayload(form);
       const created = await createProperty(payload);
 
-      if (images.length > 0) {
+      try {
         for (let index = 0; index < images.length; index += 1) {
           const image = images[index];
           await uploadPropertyImages(created.id, [image.file], {
@@ -183,16 +143,19 @@ const AddProperty = () => {
             order: index,
           });
         }
+      } catch (uploadError) {
+        await deleteProperty(created.id);
+        throw uploadError;
       }
 
       toast({
-        title: 'Tao thanh cong',
-        description: 'Bat dong san moi da duoc tao.',
+        title: 'Property created',
+        description: 'The listing has been created successfully.',
       });
       navigate(`/manage-property/${created.id}`);
     } catch (error) {
       toast({
-        title: 'Khong the tao bat dong san',
+        title: 'Cannot create property',
         description: getErrorMessage(error),
         variant: 'destructive',
       });
@@ -204,72 +167,63 @@ const AddProperty = () => {
   return (
     <div className="min-h-screen bg-[#F6F7F9]">
       <Header />
-      <main className="max-w-5xl mx-auto px-4 md:px-8 pt-28 pb-16">
-        <div className="bg-white border border-border rounded-2xl p-6 md:p-8 shadow-sm">
-          <h1 className="text-2xl font-semibold mb-6">Add New Property</h1>
-          <form className="space-y-6" onSubmit={handleSubmit}>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <input className="input-field" placeholder="Title *" value={form.title} onChange={handleInputChange('title')} />
-              <input className="input-field" placeholder="City *" value={form.city} onChange={handleInputChange('city')} />
-              <input className="input-field" placeholder="District" value={form.district} onChange={handleInputChange('district')} />
-              <input className="input-field" placeholder="Ward" value={form.ward} onChange={handleInputChange('ward')} />
-              <input className="input-field md:col-span-2" placeholder="Address *" value={form.address} onChange={handleInputChange('address')} />
-            </div>
+      <main className="mx-auto max-w-7xl px-4 pb-16 pt-28 md:px-8">
+        <div className="rounded-[32px] border border-slate-200 bg-white p-6 shadow-sm md:p-8">
+          <div className="mb-8 flex flex-col gap-3">
+            <h1 className="text-4xl font-bold text-slate-900">Create a Sell Listing</h1>
+            <p className="max-w-3xl text-slate-500">
+              This is the seller workspace. Fill in the public listing information, property details and images so the property can appear correctly in listing detail pages.
+            </p>
+          </div>
 
-            <textarea
-              className="w-full min-h-28 px-4 py-3 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
-              placeholder="Description *"
-              value={form.description}
-              onChange={handleInputChange('description')}
+          <form className="space-y-8" onSubmit={handleSubmit}>
+            <PropertyEditorFields
+              form={form}
+              onTextChange={updateField}
+              onBooleanChange={updateBooleanField}
+              onPropertyTypeChange={updatePropertyType}
+              disabled={isSubmitting}
             />
 
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-              <input className="input-field" type="number" min="1" placeholder="Price (VND) *" value={form.price} onChange={handleInputChange('price')} />
-              <input className="input-field" type="number" min="1" step="0.01" placeholder="Area (m2) *" value={form.area} onChange={handleInputChange('area')} />
-              <input className="input-field" type="number" min="0" placeholder="Bedrooms" value={form.bedrooms} onChange={handleInputChange('bedrooms')} />
-              <input className="input-field" type="number" min="0" placeholder="Bathrooms" value={form.bathrooms} onChange={handleInputChange('bathrooms')} />
-              <input className="input-field" type="number" min="0" placeholder="Floors" value={form.floors} onChange={handleInputChange('floors')} />
-              <input className="input-field" type="number" step="0.000001" placeholder="Latitude" value={form.latitude} onChange={handleInputChange('latitude')} />
-              <input className="input-field" type="number" step="0.000001" placeholder="Longitude" value={form.longitude} onChange={handleInputChange('longitude')} />
-              <select className="input-field" value={form.property_type} onChange={handleInputChange('property_type')}>
-                <option value="house">House</option>
-                <option value="apartment">Apartment</option>
-                <option value="land">Land</option>
-                <option value="villa">Villa</option>
-                <option value="other">Other</option>
-              </select>
-              <select className="input-field" value={form.listing_type} onChange={handleInputChange('listing_type')}>
-                <option value="sale">For Sale</option>
-                <option value="rent">For Rent</option>
-              </select>
-            </div>
+            <section className="rounded-[28px] border border-slate-200 bg-white p-5 md:p-6">
+              <div className="mb-5 flex items-start justify-between gap-4">
+                <div className="flex items-start gap-3">
+                  <div className="rounded-2xl bg-violet-100 p-3 text-violet-700">
+                    <ImagePlus className="h-5 w-5" />
+                  </div>
+                  <div>
+                    <h2 className="text-lg font-semibold text-slate-900">Property Images</h2>
+                    <p className="text-sm text-slate-500">
+                      Upload at least 4 images for the listing. One image must be the main cover, and every image needs a subtitle.
+                    </p>
+                  </div>
+                </div>
 
-            <section className="space-y-3">
-              <div className="flex items-center justify-between">
-                <h2 className="font-semibold">Property Images</h2>
-                <label className="inline-flex items-center px-3 py-2 rounded-lg border border-slate-300 cursor-pointer hover:bg-slate-50">
-                  Select Images
+                <label className="inline-flex cursor-pointer items-center rounded-2xl border border-slate-300 px-4 py-3 text-sm font-medium text-slate-700 transition hover:bg-slate-50">
+                  Select images
                   <input className="hidden" type="file" accept="image/*" multiple onChange={handleSelectImages} />
                 </label>
               </div>
 
               {images.length === 0 && (
-                <p className="text-sm text-slate-500">Chua co anh. Ban co the tao tin truoc va upload sau.</p>
+                <div className="rounded-[22px] border border-dashed border-slate-200 bg-slate-50 px-5 py-5 text-sm text-slate-500">
+                  Add at least 4 images before creating the listing. The first image becomes the cover automatically unless you choose another primary image.
+                </div>
               )}
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                 {images.map((image) => (
-                  <div key={image.id} className="border border-slate-200 rounded-xl p-3 space-y-3">
-                    <img src={image.preview} alt={image.file.name} className="w-full h-40 object-cover rounded-lg" />
+                  <div key={image.id} className="space-y-3 rounded-[24px] border border-slate-200 p-4">
+                    <img src={image.preview} alt={image.file.name} className="h-44 w-full rounded-2xl object-cover" />
                     <textarea
-                      className="w-full min-h-20 px-3 py-2 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
-                      placeholder="Caption"
+                      className="min-h-24 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm outline-none transition focus:border-sky-500 focus:ring-2 focus:ring-sky-500/15"
+                      placeholder="Image subtitle *"
                       value={image.caption}
                       onChange={(event) => handleCaptionChange(image.id, event.target.value)}
                     />
-                    <div className="flex gap-2">
+                    <div className="flex flex-wrap gap-2">
                       <Button type="button" variant={image.isPrimary ? 'default' : 'outline'} onClick={() => handleSetPrimary(image.id)}>
-                        {primaryImageId === image.id ? 'Primary' : 'Set Primary'}
+                        {primaryImageId === image.id ? 'Primary image' : 'Set primary'}
                       </Button>
                       <Button type="button" variant="destructive" onClick={() => handleRemoveImage(image.id)}>
                         Remove
@@ -277,6 +231,11 @@ const AddProperty = () => {
                     </div>
                   </div>
                 ))}
+              </div>
+
+              <div className="mt-5 flex items-start gap-2 rounded-[20px] bg-sky-50 px-4 py-3 text-sm text-sky-700">
+                <Info className="mt-0.5 h-4 w-4 flex-shrink-0" />
+                You can upload more than 4 images, but every image must have its own subtitle.
               </div>
             </section>
 
@@ -292,21 +251,6 @@ const AddProperty = () => {
         </div>
       </main>
       <Footer />
-
-      <style>{`
-        .input-field {
-          width: 100%;
-          padding: 0.75rem 1rem;
-          border-radius: 0.75rem;
-          border: 1px solid rgb(203 213 225);
-          outline: none;
-          background: white;
-        }
-        .input-field:focus {
-          box-shadow: 0 0 0 2px #0F766E33;
-          border-color: #0F766E;
-        }
-      `}</style>
     </div>
   );
 };

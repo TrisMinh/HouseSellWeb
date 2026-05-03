@@ -25,7 +25,7 @@ export const DEFAULT_LISTING_FILTERS: ListingFiltersState = {
   city: '',
   district: '',
   listingType: 'buy',
-  priceRange: [2, 10],
+  priceRange: [0, 60],
   selectedPricePreset: null,
   propertyTypes: [],
 };
@@ -34,7 +34,7 @@ const PRICE_PRESETS: Array<{ label: string; value: string; range: [number, numbe
   { label: 'Under 2B', value: '0-2', range: [0, 2] },
   { label: '2B - 5B', value: '2-5', range: [2, 5] },
   { label: '5B - 10B', value: '5-10', range: [5, 10] },
-  { label: 'Above 10B', value: '10-20', range: [10, 20] },
+  { label: 'Above 10B', value: '10-60', range: [10, 60] },
 ];
 
 const PROPERTY_TYPE_OPTIONS: Array<{ label: string; value: string }> = [
@@ -111,7 +111,11 @@ export const FilterSidebar = ({ value, cities, districts, onChange }: FilterSide
         <div className="space-y-3">
           <Select value={value.city || 'all'} onValueChange={(v) => handleCityChange(v === 'all' ? '' : v)}>
             <SelectTrigger className="w-full">
-              <div className="flex items-center gap-2 text-muted-foreground">
+              <div
+                className={`flex items-center gap-2 ${
+                  value.city ? 'text-foreground' : 'text-muted-foreground'
+                }`}
+              >
                 <MapPin className="w-4 h-4" />
                 <SelectValue placeholder="Select City" />
               </div>
@@ -132,7 +136,14 @@ export const FilterSidebar = ({ value, cities, districts, onChange }: FilterSide
             disabled={!value.city}
           >
             <SelectTrigger className="w-full">
-              <SelectValue placeholder="Select District" />
+              <div
+                className={`flex items-center gap-2 ${
+                  value.district ? 'text-foreground' : 'text-muted-foreground'
+                }`}
+              >
+                <MapPin className="w-4 h-4" />
+                <SelectValue placeholder="Select District" />
+              </div>
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All Districts</SelectItem>
@@ -172,11 +183,11 @@ export const FilterSidebar = ({ value, cities, districts, onChange }: FilterSide
       <div className="mb-8">
         <h4 className="text-sm font-medium mb-4">Price Range (Billion VND)</h4>
         <Slider
-          max={20}
+          max={60}
           step={0.5}
           className="mb-4"
           onValueChange={(raw) => {
-            const nextRange: [number, number] = [raw[0] ?? 0, raw[1] ?? 20];
+            const nextRange: [number, number] = [raw[0] ?? 0, raw[1] ?? 60];
             onChange({
               ...value,
               priceRange: nextRange,

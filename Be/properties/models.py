@@ -40,6 +40,11 @@ class Property(models.Model):
     bedrooms     = models.PositiveSmallIntegerField(null=True, blank=True, verbose_name='Số phòng ngủ')
     bathrooms    = models.PositiveSmallIntegerField(null=True, blank=True, verbose_name='Số phòng tắm')
     floors       = models.PositiveSmallIntegerField(null=True, blank=True, verbose_name='Số tầng')
+    year_built   = models.PositiveSmallIntegerField(null=True, blank=True, verbose_name='Năm xây dựng')
+    parking_details = models.CharField(max_length=120, blank=True, verbose_name='Thông tin đỗ xe')
+    facing       = models.CharField(max_length=80, blank=True, verbose_name='Hướng')
+    legal_status = models.CharField(max_length=120, blank=True, verbose_name='Pháp lý')
+    furniture_status = models.CharField(max_length=120, blank=True, verbose_name='Tình trạng nội thất')
 
     # Địa chỉ
     city         = models.CharField(max_length=100, verbose_name='Tỉnh/Thành phố')
@@ -54,6 +59,7 @@ class Property(models.Model):
     has_pool     = models.BooleanField(default=False, verbose_name='Có hồ bơi')
     has_garden   = models.BooleanField(default=False, verbose_name='Có sân vườn')
     is_furnished = models.BooleanField(default=False, verbose_name='Có nội thất')
+    availability_schedule = models.JSONField(default=list, blank=True, verbose_name='Lịch rảnh xem nhà')
 
     # Meta
     views_count  = models.PositiveIntegerField(default=0, verbose_name='Lượt xem')

@@ -8,6 +8,17 @@ export interface PropertyImage {
   order?: number;
 }
 
+export interface PropertyAvailabilitySlot {
+  start: string;
+  end: string;
+}
+
+export interface PropertyAvailabilityDay {
+  dayOfWeek: string;
+  enabled: boolean;
+  slots: PropertyAvailabilitySlot[];
+}
+
 export interface Property {
   id: number;
   title: string;
@@ -21,6 +32,11 @@ export interface Property {
   bedrooms: number | null;
   bathrooms: number | null;
   floors: number | null;
+  year_built?: number | null;
+  parking_details?: string | null;
+  facing?: string | null;
+  legal_status?: string | null;
+  furniture_status?: string | null;
   address: string;
   ward: string | null;
   district: string | null;
@@ -40,6 +56,8 @@ export interface Property {
   owner_name?: string;
   owner_username?: string;
   owner_phone?: string | null;
+  owner_agent_slug?: string | null;
+  availability_schedule?: PropertyAvailabilityDay[];
   images?: PropertyImage[];
   primary_image?: string | null;
   is_favorited?: boolean;
@@ -90,12 +108,25 @@ export interface CreatePropertyPayload {
   bedrooms?: number;
   bathrooms?: number;
   floors?: number;
+  year_built?: number;
+  parking_details?: string;
+  facing?: string;
+  legal_status?: string;
+  furniture_status?: string;
   address: string;
   ward?: string;
   district?: string;
   city: string;
   latitude?: number;
   longitude?: number;
+  status?: string;
+  has_parking?: boolean;
+  has_pool?: boolean;
+  has_garden?: boolean;
+  is_furnished?: boolean;
+  is_featured?: boolean;
+  is_active?: boolean;
+  availability_schedule?: PropertyAvailabilityDay[];
 }
 
 export interface FavoriteItem {

@@ -1,21 +1,56 @@
-﻿import { useState, useEffect } from "react";
-import { Link, useSearchParams, useNavigate } from "react-router-dom";
+import { ChangeEvent, useEffect, useRef, useState } from "react";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
+import { VerificationRequestModal } from "@/components/profile/VerificationRequestModal";
 import {
-  Mail, Phone, MapPin, Edit, Clock, CheckCircle2, Save,
-  Eye, EyeOff, TrendingUp, Home, Calendar, ArrowRight, X,
-  Building2, BadgeDollarSign, ShoppingCart, ChevronLeft, ChevronRight, Loader2
+  ArrowRight,
+  BadgeDollarSign,
+  Building2,
+  Calendar,
+  CheckCircle2,
+  ChevronLeft,
+  ChevronRight,
+  Clock,
+  Edit,
+  Eye,
+  EyeOff,
+  Home,
+  Loader2,
+  Mail,
+  MapPin,
+  Phone,
+  Save,
+  ShieldAlert,
+  ShieldCheck,
+  ShieldQuestion,
+  ShoppingCart,
+  TrendingUp,
+  Upload,
+  X,
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { updateProfile } from "@/lib/authApi";
-import { getMyAppointments, Appointment } from "@/lib/appointmentsApi";
+import { getMyAppointments, getOwnerAppointments, Appointment } from "@/lib/appointmentsApi";
 import { getImageUrl, getMyProperties, normalizeListResponse } from "@/lib/propertiesApi";
+import { getUserDisplayName, getUserInitials } from "@/lib/userProfile";
+import { createVerificationRequest } from "@/lib/verificationApi";
 import { Line } from "react-chartjs-2";
 import {
   Chart as ChartJS,
+  CategoryScale,
+  Filler,
+  Legend,
+  LinearScale,
+  LineElement,
+  PointElement,
+  Title,
+  Tooltip,
+} from "chart.js";
+
+ChartJS.register(
   CategoryScale,
   LinearScale,
   PointElement,
@@ -24,16 +59,11 @@ import {
   Tooltip,
   Legend,
   Filler,
-} from "chart.js";
-
-ChartJS.register(
-  CategoryScale, LinearScale, PointElement, LineElement,
-  Title, Tooltip, Legend, Filler
 );
 
-// Dummy stats (sáº½ Ä‘Æ°á»£c thay báº±ng API riÃªng sau)
 const FALLBACK_PROPERTY_IMAGE =
   "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&q=80&w=600";
+const ACCEPTED_AVATAR_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"];
 
 type SellItem = {
   id: number;
@@ -41,21 +71,14 @@ type SellItem = {
   price: string;
   rawPrice: number;
   address: string;
+  city: string;
   status: string;
   daysListed: number;
   newAppointments: number;
   image: string;
+  createdAt: string;
+  listingTypeLabel: string;
 };
-
-const BUY_LIST = Array.from({ length: 15 }, (_, i) => ({
-  id: i + 1, 
-  property: i % 2 === 0 ? `Garden Villa â€“ Ecopark ${i + 1}` : `Premium Shophouse ${i + 1}`,
-  seller: i % 2 === 0 ? "Tran Trung (Broker)" : "Le Lan Anh (Owner)",
-  date: `10:30 AM, ${15 + i} Mar`, 
-  status: i % 3 === 0 ? "Pending" : "Confirmed", 
-  price: `${12 + i} Billion VND`,
-  image: i % 2 === 0 ? "https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?auto=format&fit=crop&q=80&w=400" : "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&q=80&w=400",
-}));
 
 type TabKey = "profile" | "buy" | "sell";
 
@@ -65,29 +88,37 @@ const TABS: { key: TabKey; label: string; icon: React.ReactNode }[] = [
   { key: "sell", label: "Sell", icon: <BadgeDollarSign className="w-4 h-4" /> },
 ];
 
-const statusColor = (s: string) => {
-  if (s === "Confirmed") return "bg-emerald-50 text-emerald-700 border-emerald-200";
-  if (s === "Pending" || s === "Negotiating") return "bg-amber-50 text-amber-700 border-amber-200";
-  if (s === "For Sale") return "bg-blue-50 text-blue-700 border-blue-200";
-  if (s === "New") return "bg-violet-50 text-violet-700 border-violet-200";
+const CHART_LABELS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+const CHART_DATA = {
+  revenue: [1.2, 2.8, 5.5, 4.2, 3.8, 8.2, 12.5, 10.8, 9.6, 15.2, 13.0, 18.5],
+};
+
+const countWords = (value: string) => value.trim().split(/\s+/).filter(Boolean).length;
+
+const statusColor = (status: string) => {
+  if (status === "Confirmed") return "bg-emerald-50 text-emerald-700 border-emerald-200";
+  if (status === "Pending" || status === "Negotiating") return "bg-amber-50 text-amber-700 border-amber-200";
+  if (status === "For Sale") return "bg-blue-50 text-blue-700 border-blue-200";
+  if (status === "New") return "bg-violet-50 text-violet-700 border-violet-200";
   return "bg-teal-50 text-teal-700 border-teal-200";
 };
 
-const PaginationControls = ({ 
-  currentPage, 
-  totalPages, 
-  onPageChange 
-}: { 
-  currentPage: number; 
-  totalPages: number; 
-  onPageChange: (page: number) => void; 
+const PaginationControls = ({
+  currentPage,
+  totalPages,
+  onPageChange,
+}: {
+  currentPage: number;
+  totalPages: number;
+  onPageChange: (page: number) => void;
 }) => {
   if (totalPages <= 1) return null;
+
   return (
     <div className="flex items-center justify-center gap-4 mt-8 pb-4">
-      <Button 
-        variant="outline" 
-        size="sm" 
+      <Button
+        variant="outline"
+        size="sm"
         onClick={() => {
           onPageChange(Math.max(1, currentPage - 1));
           window.scrollTo({ top: 400, behavior: "smooth" });
@@ -97,12 +128,14 @@ const PaginationControls = ({
       >
         <ChevronLeft className="w-4 h-4 mr-1" /> Previous
       </Button>
+
       <div className="text-sm font-medium text-gray-600 px-4">
         Page {currentPage} of {totalPages}
       </div>
-      <Button 
-        variant="outline" 
-        size="sm" 
+
+      <Button
+        variant="outline"
+        size="sm"
         onClick={() => {
           onPageChange(Math.min(totalPages, currentPage + 1));
           window.scrollTo({ top: 400, behavior: "smooth" });
@@ -116,148 +149,150 @@ const PaginationControls = ({
   );
 };
 
-const CHART_LABELS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-const CHART_DATA = {
-  revenue: [1.2, 2.8, 5.5, 4.2, 3.8, 8.2, 12.5, 10.8, 9.6, 15.2, 13.0, 18.5],
-};
-
 const Profile = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const { user, loading: authLoading, refreshUser } = useAuth();
-  const initialTab = (searchParams.get('tab') as TabKey) || "profile";
+  const initialTab = (searchParams.get("tab") as TabKey) || "profile";
+
   const [activeTab, setActiveTab] = useState<TabKey>(initialTab);
-  
   const [buyPage, setBuyPage] = useState(1);
   const [sellPage, setSellPage] = useState(1);
-  const buyItemsPerPage = 5;
-  const sellItemsPerPage = 9;
-  
-  // Real appointments/sell listings state
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [loadingAppointments, setLoadingAppointments] = useState(false);
   const [sellListings, setSellListings] = useState<SellItem[]>([]);
   const [loadingSellListings, setLoadingSellListings] = useState(false);
+  const [editingInfo, setEditingInfo] = useState(false);
+  const [editingBio, setEditingBio] = useState(false);
+  const [editingIntro, setEditingIntro] = useState(false);
+  const [savingInfo, setSavingInfo] = useState(false);
+  const [savingBio, setSavingBio] = useState(false);
+  const [savingIntro, setSavingIntro] = useState(false);
+  const [activityVisible, setActivityVisible] = useState(user?.activity_visible ?? true);
+  const [uploadingAvatar, setUploadingAvatar] = useState(false);
+  const [avatarError, setAvatarError] = useState("");
+  const [introError, setIntroError] = useState("");
+  const [verificationRequestOpen, setVerificationRequestOpen] = useState(false);
+  const [submittingVerification, setSubmittingVerification] = useState(false);
+  const [verificationError, setVerificationError] = useState("");
+  const avatarInputRef = useRef<HTMLInputElement | null>(null);
+
+  const buyItemsPerPage = 5;
+  const sellItemsPerPage = 9;
+  const displayName = getUserDisplayName(user);
+  const displayInitials = getUserInitials(user);
+  const verificationStatus = user?.verification_status ?? null;
+  const verificationMessage = user?.verification_message ?? "";
+
+  const [infoData, setInfoData] = useState({
+    email: user?.email ?? "",
+    phone: user?.phone ?? "",
+    location: user?.address ?? "",
+  });
+  const [bioData, setBioData] = useState({
+    bio: user?.bio ?? "",
+    firstName: user?.first_name ?? "",
+    lastName: user?.last_name ?? "",
+  });
+  const [introData, setIntroData] = useState(user?.short_intro ?? "");
+  const introWordCount = countWords(introData);
 
   useEffect(() => {
+    if (!user || activeTab !== "buy") return;
+
     const fetchAppointments = async () => {
-      if (activeTab === 'buy' && user) {
-        setLoadingAppointments(true);
-        try {
-          const response = await getMyAppointments();
-          if ('results' in response && Array.isArray(response.results)) {
-            setAppointments(response.results as Appointment[]);
-          } else if (Array.isArray(response)) {
-             setAppointments(response);
-          }
-        } catch (error) {
-          console.error("Failed to load appointments:", error);
-        } finally {
-          setLoadingAppointments(false);
+      setLoadingAppointments(true);
+      try {
+        const response = await getMyAppointments();
+        if ("results" in response && Array.isArray(response.results)) {
+          setAppointments(response.results as Appointment[]);
+        } else if (Array.isArray(response)) {
+          setAppointments(response);
         }
+      } catch (error) {
+        console.error("Failed to load appointments:", error);
+      } finally {
+        setLoadingAppointments(false);
       }
     };
+
     fetchAppointments();
   }, [activeTab, user]);
 
   useEffect(() => {
+    if (!user) return;
+
     const fetchSellListings = async () => {
-      if (activeTab === 'sell' && user) {
-        setLoadingSellListings(true);
-        try {
-          const response = await getMyProperties();
-          const properties = normalizeListResponse(response);
-          const mapped: SellItem[] = properties.map((item) => {
-            const createdAt = item.created_at ? new Date(item.created_at) : new Date();
-            const elapsedDays = Math.max(
-              1,
-              Math.ceil((Date.now() - createdAt.getTime()) / (1000 * 60 * 60 * 24))
-            );
-            const numericPrice = Number(item.price || 0);
-            return {
-              id: item.id,
-              title: item.title,
-              price: `${new Intl.NumberFormat("vi-VN").format(numericPrice)} VND`,
-              rawPrice: numericPrice,
-              address: [item.address, item.district, item.city].filter(Boolean).join(", "),
-              status: item.status_display || item.status || "For Sale",
-              daysListed: elapsedDays,
-              newAppointments: 0,
-              image: item.primary_image ? getImageUrl(item.primary_image) : FALLBACK_PROPERTY_IMAGE,
-            };
-          });
-          setSellListings(mapped);
-        } catch (error) {
-          console.error("Failed to load sell listings:", error);
-          setSellListings([]);
-        } finally {
-          setLoadingSellListings(false);
-        }
+      setLoadingSellListings(true);
+      try {
+        const [response, ownerAppointmentsResponse] = await Promise.all([
+          getMyProperties(),
+          getOwnerAppointments(),
+        ]);
+        const properties = normalizeListResponse(response);
+        const ownerAppointments = Array.isArray(ownerAppointmentsResponse)
+          ? ownerAppointmentsResponse
+          : ownerAppointmentsResponse.results;
+        const mapped: SellItem[] = properties.map((item) => {
+          const createdAt = item.created_at ? new Date(item.created_at) : new Date();
+          const elapsedDays = Math.max(
+            1,
+            Math.ceil((Date.now() - createdAt.getTime()) / (1000 * 60 * 60 * 24)),
+          );
+          const numericPrice = Number(item.price || 0);
+
+          return {
+            id: item.id,
+            title: item.title,
+            price: `${new Intl.NumberFormat("vi-VN").format(numericPrice)} VND`,
+            rawPrice: numericPrice,
+            address: [item.address, item.district, item.city].filter(Boolean).join(", "),
+            city: item.city || "",
+            status: item.status_display || item.status || "For Sale",
+            daysListed: elapsedDays,
+            newAppointments: ownerAppointments.filter((appointment) => appointment.property === item.id).length,
+            image: item.primary_image ? getImageUrl(item.primary_image) : FALLBACK_PROPERTY_IMAGE,
+            createdAt: item.created_at || createdAt.toISOString(),
+            listingTypeLabel: item.listing_type_display || "For sale",
+          };
+        });
+        setSellListings(mapped);
+      } catch (error) {
+        console.error("Failed to load sell listings:", error);
+        setSellListings([]);
+      } finally {
+        setLoadingSellListings(false);
       }
     };
+
     fetchSellListings();
-  }, [activeTab, user]);
+  }, [user]);
 
-  const displayBuyList = appointments.length > 0 ? 
-    appointments.map(a => ({
-      id: a.id,
-      property: a.property_title,
-      seller: a.property_owner,
-      date: `${a.time}, ${new Date(a.date).toLocaleDateString()}`,
-      status: a.status.charAt(0).toUpperCase() + a.status.slice(1),
-      price: "â€”", // Backend DTO doesn't include price yet, but that's fine for now
-      image: "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&q=80&w=600"
-    })) : 
-    BUY_LIST;
-
-  const paginatedBuy = displayBuyList.slice((buyPage - 1) * buyItemsPerPage, buyPage * buyItemsPerPage);
-  const totalBuyPages = Math.ceil(displayBuyList.length / buyItemsPerPage);
-
-  const paginatedSell = sellListings.slice((sellPage - 1) * sellItemsPerPage, sellPage * sellItemsPerPage);
-  const totalSellPages = Math.max(1, Math.ceil(sellListings.length / sellItemsPerPage));
-  const totalSellValue = sellListings.reduce((sum, item) => sum + item.rawPrice, 0);
-  const profileStats = {
-    totalValue: sellListings.length
-      ? `${new Intl.NumberFormat("vi-VN").format(totalSellValue)} VND`
-      : "—",
-    properties: sellListings.length,
-    appointments: appointments.length,
-  };
-
-  const [editingInfo, setEditingInfo] = useState(false);
-  const [editingBio, setEditingBio] = useState(false);
-  const [savingInfo, setSavingInfo] = useState(false);
-  const [savingBio, setSavingBio] = useState(false);
-  const [activityVisible, setActivityVisible] = useState(true);
-
-  // Láº¥y giÃ¡ trá»‹ tá»« user thá»±c, fallback vá» empty string
-  const [infoData, setInfoData] = useState({
-    email: user?.email ?? '',
-    phone: user?.phone ?? '',
-    location: user?.address ?? '',
-  });
-  const [bioData, setBioData] = useState({
-    bio: user?.bio ?? '',
-    firstName: user?.first_name ?? '',
-    lastName: user?.last_name ?? '',
-  });
-
-  // Sync khi user load xong
   useEffect(() => {
-    if (user) {
-      setInfoData({ email: user.email, phone: user.phone ?? '', location: user.address ?? '' });
-      setBioData({ bio: user.bio ?? '', firstName: user.first_name, lastName: user.last_name });
-    }
+    if (!user) return;
+    setInfoData({
+      email: user.email,
+      phone: user.phone ?? "",
+      location: user.address ?? "",
+    });
+    setBioData({
+      bio: user.bio ?? "",
+      firstName: user.first_name ?? "",
+      lastName: user.last_name ?? "",
+    });
+    setIntroData(user.short_intro ?? "");
+    setActivityVisible(user.activity_visible ?? true);
   }, [user]);
 
   const handleSaveInfo = async () => {
     setSavingInfo(true);
     try {
-      await updateProfile({ phone: infoData.phone, address: infoData.location });
+      await updateProfile({
+        phone: infoData.phone,
+        address: infoData.location,
+      });
       await refreshUser();
       setEditingInfo(false);
-    } catch {
-      // TODO: show error toast
     } finally {
       setSavingInfo(false);
     }
@@ -273,14 +308,124 @@ const Profile = () => {
       });
       await refreshUser();
       setEditingBio(false);
-    } catch {
-      // TODO: show error toast
     } finally {
       setSavingBio(false);
     }
   };
 
-  const displayName = user ? `${user.first_name} ${user.last_name}`.trim() || user.username : 'â€”';
+  const handleSaveIntro = async () => {
+    const trimmedIntro = introData.trim();
+    const wordCount = countWords(trimmedIntro);
+
+    if (wordCount > 50) {
+      setIntroError("Short intro must be 50 words or fewer.");
+      return;
+    }
+
+    setSavingIntro(true);
+    setIntroError("");
+
+    try {
+      await updateProfile({
+        short_intro: trimmedIntro,
+      });
+      await refreshUser();
+      setEditingIntro(false);
+    } catch (error) {
+      console.error("Failed to update short intro:", error);
+      setIntroError("Could not update the short intro. Please try again.");
+    } finally {
+      setSavingIntro(false);
+    }
+  };
+
+  const handleAvatarButtonClick = () => {
+    avatarInputRef.current?.click();
+  };
+
+  const handleAvatarChange = async (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    event.target.value = "";
+
+    if (!file) return;
+
+    if (!ACCEPTED_AVATAR_TYPES.includes(file.type)) {
+      setAvatarError("Please choose a JPG, PNG, WEBP, or GIF image.");
+      return;
+    }
+
+    setAvatarError("");
+    setUploadingAvatar(true);
+
+    try {
+      const formData = new FormData();
+      formData.append("avatar", file);
+      await updateProfile(formData);
+      await refreshUser();
+    } catch (error) {
+      console.error("Failed to upload avatar:", error);
+      setAvatarError("Could not update avatar. Please try again.");
+    } finally {
+      setUploadingAvatar(false);
+    }
+  };
+
+  const handleVerificationSubmit = async (payload: Parameters<typeof createVerificationRequest>[0]) => {
+    setSubmittingVerification(true);
+    setVerificationError("");
+
+    try {
+      await createVerificationRequest(payload);
+      await refreshUser();
+      setVerificationRequestOpen(false);
+    } catch (error) {
+      console.error("Failed to submit verification request:", error);
+      const detail = (error as { response?: { data?: { detail?: string } } }).response?.data?.detail;
+      setVerificationError(detail || "Could not submit verification request.");
+    } finally {
+      setSubmittingVerification(false);
+    }
+  };
+
+  const handleToggleActivityVisibility = async () => {
+    const nextValue = !activityVisible;
+    setActivityVisible(nextValue);
+
+    try {
+      await updateProfile({
+        activity_visible: nextValue,
+      });
+      await refreshUser();
+    } catch (error) {
+      console.error("Failed to update activity visibility:", error);
+      setActivityVisible(!nextValue);
+    }
+  };
+
+  const displayBuyList = appointments.map((appointment) => ({
+    id: appointment.id,
+    property: appointment.property_title,
+    seller: appointment.property_owner,
+    date: `${appointment.time}, ${new Date(appointment.date).toLocaleDateString()}`,
+    status: appointment.status.charAt(0).toUpperCase() + appointment.status.slice(1),
+    price: "—",
+    image: FALLBACK_PROPERTY_IMAGE,
+  }));
+
+  const paginatedBuy = displayBuyList.slice((buyPage - 1) * buyItemsPerPage, buyPage * buyItemsPerPage);
+  const totalBuyPages = Math.max(1, Math.ceil(displayBuyList.length / buyItemsPerPage));
+
+  const paginatedSell = sellListings.slice((sellPage - 1) * sellItemsPerPage, sellPage * sellItemsPerPage);
+  const totalSellPages = Math.max(1, Math.ceil(sellListings.length / sellItemsPerPage));
+  const totalSellValue = sellListings.reduce((sum, item) => sum + item.rawPrice, 0);
+  const latestActivities = [...sellListings]
+    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+    .slice(0, 2);
+  const profileStats = {
+    totalValue: sellListings.length ? `${new Intl.NumberFormat("vi-VN").format(totalSellValue)} VND` : "—",
+    properties: sellListings.length,
+    appointments: appointments.length,
+  };
 
   if (authLoading) {
     return (
@@ -291,30 +436,114 @@ const Profile = () => {
   }
 
   return (
-    <div className="min-h-screen bg-[#F8FAFB] font-['Josefin_Sans']">
-      <style>{`@import url('https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@300;400;500;600;700&display=swap');`}</style>
-
+    <div className="min-h-screen bg-[#F8FAFB] font-sans">
       <Header />
 
-      <main style={{ paddingTop: '140px' }}>
+      <main className="pt-[140px]">
         <div className="relative bg-white border-b border-gray-100">
           <div className="max-w-6xl mx-auto px-6 pt-8">
-            <div className="flex flex-col md:flex-row md:items-end gap-5">
-              <div className="relative z-10 group w-fit">
+            <div className="flex flex-col gap-5 md:flex-row md:items-end">
+              <div className="relative z-10 w-fit">
                 <Avatar className="w-32 h-32 border-4 border-white shadow-xl bg-white">
-                  <AvatarImage src={user?.avatar ?? undefined} className="object-cover" />
+                  <AvatarImage src={user?.avatar ?? undefined} alt={displayName} className="object-cover" />
                   <AvatarFallback className="text-3xl bg-teal-50 text-teal-700">
-                    {displayName.slice(0, 2).toUpperCase() || 'U'}
+                    {displayInitials}
                   </AvatarFallback>
                 </Avatar>
-                <button className="absolute bottom-3 right-3 bg-white p-1.5 rounded-full shadow border border-gray-200 cursor-pointer hover:scale-110 transition-transform">
-                  <Edit className="w-3.5 h-3.5 text-gray-600" />
+
+                <input
+                  ref={avatarInputRef}
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp,image/gif"
+                  className="hidden"
+                  onChange={handleAvatarChange}
+                />
+
+                <button
+                  type="button"
+                  onClick={handleAvatarButtonClick}
+                  disabled={uploadingAvatar}
+                  className="absolute bottom-3 right-3 bg-white p-2 rounded-full shadow border border-gray-200 cursor-pointer hover:scale-110 transition-transform disabled:cursor-not-allowed disabled:hover:scale-100"
+                  aria-label="Change avatar"
+                >
+                  {uploadingAvatar ? (
+                    <Loader2 className="w-3.5 h-3.5 text-gray-600 animate-spin" />
+                  ) : (
+                    <Upload className="w-3.5 h-3.5 text-gray-600" />
+                  )}
                 </button>
+
+                {avatarError && <p className="mt-3 text-sm text-red-600 max-w-48">{avatarError}</p>}
               </div>
 
               <div className="flex-1 pb-2">
                 <h1 className="text-2xl md:text-3xl font-bold text-gray-900 font-['Inter']">{displayName}</h1>
-                <p className="text-gray-500 text-sm mt-0.5" style={{ paddingLeft: '5px' }}>@{user?.username}</p>
+                <div className="mt-2 pl-1 max-w-2xl">
+                  {!editingIntro ? (
+                    <div className="flex items-start gap-3">
+                      <p className="text-gray-500 text-sm leading-6">
+                        {user?.short_intro?.trim() || "Add a short introduction about yourself in up to 50 words."}
+                      </p>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setEditingIntro(true);
+                          setIntroError("");
+                        }}
+                        className="p-1.5 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer flex-shrink-0"
+                        title="Edit short intro"
+                      >
+                        <Edit className="w-4 h-4 text-gray-400" />
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="space-y-3">
+                      <textarea
+                        value={introData}
+                        onChange={(event) => {
+                          setIntroData(event.target.value);
+                          if (introError) {
+                            setIntroError("");
+                          }
+                        }}
+                        rows={2}
+                        className="w-full max-w-xl rounded-xl border border-gray-200 px-3 py-2 text-sm text-gray-700 outline-none focus:border-[#14B8A6] transition-colors resize-none"
+                        placeholder="Write a short introduction about yourself."
+                      />
+                      <div className="flex flex-wrap items-center gap-3">
+                        <span className={`text-xs ${introWordCount > 50 ? "text-red-600" : "text-gray-400"}`}>
+                          {introWordCount}/50 words
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setIntroData(user?.short_intro ?? "");
+                            setEditingIntro(false);
+                            setIntroError("");
+                          }}
+                          className="p-2 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer"
+                          title="Cancel"
+                        >
+                          <X className="w-4 h-4 text-gray-400" />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={handleSaveIntro}
+                          disabled={savingIntro}
+                          className="p-2 rounded-lg bg-[#0F766E] hover:bg-[#0F766E]/90 transition-colors cursor-pointer disabled:opacity-60"
+                          title="Save"
+                        >
+                          {savingIntro ? (
+                            <Loader2 className="w-4 h-4 text-white animate-spin" />
+                          ) : (
+                            <Save className="w-4 h-4 text-white" />
+                          )}
+                        </button>
+                      </div>
+                      {introError && <p className="text-sm text-red-600">{introError}</p>}
+                    </div>
+                  )}
+                </div>
               </div>
 
               <div className="flex gap-8 pb-3">
@@ -322,10 +551,13 @@ const Profile = () => {
                   { label: "Total Value", value: profileStats.totalValue, icon: <TrendingUp className="w-4 h-4" /> },
                   { label: "Active Listings", value: profileStats.properties, icon: <Building2 className="w-4 h-4" /> },
                   { label: "Appointments", value: profileStats.appointments, icon: <Calendar className="w-4 h-4" /> },
-                ].map((s) => (
-                  <div key={s.label} className="text-center">
-                    <div className="text-2xl font-bold text-gray-900 font-['Inter']">{s.value}</div>
-                    <div className="text-xs text-gray-400 mt-0.5 flex items-center justify-center gap-1">{s.icon}{s.label}</div>
+                ].map((stat) => (
+                  <div key={stat.label} className="text-center">
+                    <div className="text-2xl font-bold text-gray-900 font-['Inter']">{stat.value}</div>
+                    <div className="text-xs text-gray-400 mt-0.5 flex items-center justify-center gap-1">
+                      {stat.icon}
+                      {stat.label}
+                    </div>
                   </div>
                 ))}
               </div>
@@ -336,11 +568,11 @@ const Profile = () => {
                 <button
                   key={tab.key}
                   onClick={() => setActiveTab(tab.key)}
-                  className={`flex items-center gap-2 px-5 py-3 text-sm font-semibold transition-colors cursor-pointer rounded-t-lg
-                    ${activeTab === tab.key
+                  className={`flex items-center gap-2 px-5 py-3 text-sm font-semibold transition-colors cursor-pointer rounded-t-lg ${
+                    activeTab === tab.key
                       ? "text-[#0F766E] border-b-2 border-[#0F766E] bg-white"
                       : "text-gray-400 hover:text-gray-600 hover:bg-gray-50"
-                    }`}
+                  }`}
                 >
                   {tab.icon}
                   {tab.label}
@@ -351,28 +583,46 @@ const Profile = () => {
         </div>
 
         <div className="max-w-6xl mx-auto px-6 py-8">
-
           {activeTab === "profile" && (
             <div className="grid grid-cols-1 lg:grid-cols-5 gap-8 animate-[fadeIn_0.3s_ease]">
               <div className="lg:col-span-2 space-y-6">
                 <div className="bg-white rounded-2xl pt-3 px-4 pb-6 border border-gray-100 shadow-sm relative">
                   <h3 className="text-lg font-bold text-gray-900 mb-5 font-['Inter']">Info</h3>
+
                   <div className="absolute top-3 right-3">
                     {!editingInfo ? (
-                      <button onClick={() => setEditingInfo(true)} className="p-2 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer" title="Sá»­a">
+                      <button
+                        onClick={() => setEditingInfo(true)}
+                        className="p-2 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer"
+                        title="Edit"
+                      >
                         <Edit className="w-4 h-4 text-gray-400" />
                       </button>
                     ) : (
                       <div className="flex gap-1">
-                        <button onClick={() => { setEditingInfo(false); }} className="p-2 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer" title="Há»§y">
+                        <button
+                          onClick={() => setEditingInfo(false)}
+                          className="p-2 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer"
+                          title="Cancel"
+                        >
                           <X className="w-4 h-4 text-gray-400" />
                         </button>
-                        <button onClick={handleSaveInfo} disabled={savingInfo} className="p-2 rounded-lg bg-[#0F766E] hover:bg-[#0F766E]/90 transition-colors cursor-pointer disabled:opacity-60" title="LÆ°u">
-                          {savingInfo ? <Loader2 className="w-4 h-4 text-white animate-spin" /> : <Save className="w-4 h-4 text-white" />}
+                        <button
+                          onClick={handleSaveInfo}
+                          disabled={savingInfo}
+                          className="p-2 rounded-lg bg-[#0F766E] hover:bg-[#0F766E]/90 transition-colors cursor-pointer disabled:opacity-60"
+                          title="Save"
+                        >
+                          {savingInfo ? (
+                            <Loader2 className="w-4 h-4 text-white animate-spin" />
+                          ) : (
+                            <Save className="w-4 h-4 text-white" />
+                          )}
                         </button>
                       </div>
                     )}
                   </div>
+
                   <div className="space-y-4">
                     {[
                       { icon: <Mail className="w-4 h-4 text-[#0F766E]" />, label: "EMAIL", key: "email" as const, editable: false },
@@ -380,18 +630,24 @@ const Profile = () => {
                       { icon: <MapPin className="w-4 h-4 text-[#0F766E]" />, label: "LOCATION", key: "location" as const, editable: true },
                     ].map((info) => (
                       <div key={info.label} className="flex items-start gap-3">
-                        <div className="w-9 h-9 rounded-full bg-[#F0FDFA] flex items-center justify-center flex-shrink-0 mt-0.5">{info.icon}</div>
+                        <div className="w-9 h-9 rounded-full bg-[#F0FDFA] flex items-center justify-center flex-shrink-0 mt-0.5">
+                          {info.icon}
+                        </div>
                         <div className="flex-1">
-                          <div className="text-[10px] font-bold uppercase tracking-widest text-gray-400">{info.label}</div>
+                          <div className="text-[10px] font-bold uppercase tracking-widest text-gray-400">
+                            {info.label}
+                          </div>
                           {editingInfo && info.editable ? (
                             <input
                               type="text"
                               value={infoData[info.key]}
-                              onChange={(e) => setInfoData({ ...infoData, [info.key]: e.target.value })}
+                              onChange={(event) => setInfoData({ ...infoData, [info.key]: event.target.value })}
                               className="text-sm text-gray-700 font-medium w-full border border-gray-200 rounded-lg px-3 py-1.5 mt-1 outline-none focus:border-[#14B8A6] transition-colors"
                             />
                           ) : (
-                            <div className="text-sm text-gray-700 font-medium">{infoData[info.key] || <span className="text-gray-400 italic">ChÆ°a cáº­p nháº­t</span>}</div>
+                            <div className="text-sm text-gray-700 font-medium">
+                              {infoData[info.key] || <span className="text-gray-400 italic">Not updated yet</span>}
+                            </div>
                           )}
                         </div>
                       </div>
@@ -401,51 +657,77 @@ const Profile = () => {
 
                 <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm relative">
                   <h3 className="text-lg font-bold text-gray-900 mb-3 font-['Inter']">Biography</h3>
+
                   <div className="absolute top-3 right-3">
                     {!editingBio ? (
-                      <button onClick={() => setEditingBio(true)} className="p-2 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer" title="Sá»­a">
+                      <button
+                        onClick={() => setEditingBio(true)}
+                        className="p-2 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer"
+                        title="Edit"
+                      >
                         <Edit className="w-4 h-4 text-gray-400" />
                       </button>
                     ) : (
                       <div className="flex gap-1">
-                        <button onClick={() => setEditingBio(false)} className="p-2 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer" title="Há»§y">
+                        <button
+                          onClick={() => setEditingBio(false)}
+                          className="p-2 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer"
+                          title="Cancel"
+                        >
                           <X className="w-4 h-4 text-gray-400" />
                         </button>
-                        <button onClick={handleSaveBio} disabled={savingBio} className="p-2 rounded-lg bg-[#0F766E] hover:bg-[#0F766E]/90 transition-colors cursor-pointer disabled:opacity-60" title="LÆ°u">
-                          {savingBio ? <Loader2 className="w-4 h-4 text-white animate-spin" /> : <Save className="w-4 h-4 text-white" />}
+                        <button
+                          onClick={handleSaveBio}
+                          disabled={savingBio}
+                          className="p-2 rounded-lg bg-[#0F766E] hover:bg-[#0F766E]/90 transition-colors cursor-pointer disabled:opacity-60"
+                          title="Save"
+                        >
+                          {savingBio ? (
+                            <Loader2 className="w-4 h-4 text-white animate-spin" />
+                          ) : (
+                            <Save className="w-4 h-4 text-white" />
+                          )}
                         </button>
                       </div>
                     )}
                   </div>
+
                   <h4 className="font-semibold text-sm text-gray-700 mb-2">About Me</h4>
                   {editingBio ? (
                     <textarea
                       value={bioData.bio}
-                      onChange={(e) => setBioData({ ...bioData, bio: e.target.value })}
+                      onChange={(event) => setBioData({ ...bioData, bio: event.target.value })}
                       rows={3}
                       className="text-sm text-gray-500 leading-relaxed mb-5 w-full border border-gray-200 rounded-lg px-3 py-2 outline-none focus:border-[#14B8A6] transition-colors resize-none"
                     />
                   ) : (
-                    <p className="text-sm text-gray-500 leading-relaxed mb-5">{bioData.bio || <span className="italic text-gray-400">ChÆ°a cÃ³ giá»›i thiá»‡u.</span>}</p>
+                    <p className="text-sm text-gray-500 leading-relaxed mb-5">
+                      {bioData.bio || <span className="italic text-gray-400">No introduction yet.</span>}
+                    </p>
                   )}
+
                   <div className="space-y-3 border-t border-gray-100 pt-4">
                     {[
-                      { label: "Há»", editKey: "firstName" as const, display: bioData.firstName, editable: true },
-                      { label: "TÃªn", editKey: "lastName" as const, display: bioData.lastName, editable: true },
+                      { label: "First Name", editKey: "firstName" as const, display: bioData.firstName, editable: true },
+                      { label: "Last Name", editKey: "lastName" as const, display: bioData.lastName, editable: true },
                       { label: "Username", editKey: null, display: user?.username, editable: false },
                       { label: "Email", editKey: null, display: user?.email, editable: false },
-                    ].map((d) => (
-                      <div key={d.label} className="flex items-center text-sm">
-                        <span className="text-gray-400 w-28 flex-shrink-0">{d.label}:</span>
-                        {editingBio && d.editable && d.editKey ? (
+                    ].map((detail) => (
+                      <div key={detail.label} className="flex items-center text-sm">
+                        <span className="text-gray-400 w-28 flex-shrink-0">{detail.label}:</span>
+                        {editingBio && detail.editable && detail.editKey ? (
                           <input
                             type="text"
-                            value={bioData[d.editKey]}
-                            onChange={(e) => setBioData({ ...bioData, [d.editKey!]: e.target.value })}
+                            value={bioData[detail.editKey]}
+                            onChange={(event) =>
+                              setBioData({ ...bioData, [detail.editKey]: event.target.value })
+                            }
                             className="font-medium text-gray-700 flex-1 border border-gray-200 rounded-lg px-3 py-1 outline-none focus:border-[#14B8A6] transition-colors"
                           />
                         ) : (
-                          <span className="font-medium text-gray-700">{d.display || <span className="italic text-gray-400">â€”</span>}</span>
+                          <span className="font-medium text-gray-700">
+                            {detail.display || <span className="italic text-gray-400">—</span>}
+                          </span>
                         )}
                       </div>
                     ))}
@@ -454,21 +736,75 @@ const Profile = () => {
               </div>
 
               <div className="lg:col-span-3 space-y-6">
+                {!user?.is_staff && (
+                  <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
+                    <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+                      <div>
+                        <div className="flex items-center gap-2">
+                          {user?.agent_is_verified ? (
+                            <ShieldCheck className="w-5 h-5 text-emerald-600" />
+                          ) : verificationStatus === "denied" ? (
+                            <ShieldAlert className="w-5 h-5 text-rose-600" />
+                          ) : (
+                            <ShieldQuestion className="w-5 h-5 text-amber-600" />
+                          )}
+                          <h3 className="text-lg font-bold text-gray-900 font-['Inter']">Agent Verification</h3>
+                        </div>
+                        <p className="text-sm text-gray-500 mt-2">
+                          {user?.agent_is_verified
+                            ? "Your agent account is verified and visible as trusted."
+                            : "Submit identity documents so an admin can review your agent profile."}
+                        </p>
+                      </div>
+
+                      {!user?.agent_is_verified && (
+                        <Button
+                          type="button"
+                          onClick={() => setVerificationRequestOpen(true)}
+                          disabled={verificationStatus === "pending"}
+                          className="rounded-full bg-[#0369A1] hover:bg-[#0369A1]/90 text-white px-6 cursor-pointer disabled:opacity-60"
+                        >
+                          {verificationStatus === "pending" ? "Pending review" : "Verify"}
+                        </Button>
+                      )}
+                    </div>
+
+                    {verificationStatus === "denied" && (
+                      <div className="mt-4 rounded-2xl bg-rose-50 border border-rose-100 px-4 py-3 text-sm text-rose-700">
+                        {verificationMessage || "Your verification request was denied. Please review your details and submit again."}
+                      </div>
+                    )}
+
+                    {verificationStatus === "pending" && (
+                      <div className="mt-4 rounded-2xl bg-amber-50 border border-amber-100 px-4 py-3 text-sm text-amber-700">
+                        Your verification request is waiting for admin approval.
+                      </div>
+                    )}
+
+                    {verificationError && (
+                      <div className="mt-4 rounded-2xl bg-rose-50 border border-rose-100 px-4 py-3 text-sm text-rose-700">
+                        {verificationError}
+                      </div>
+                    )}
+                  </div>
+                )}
+
                 <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
                   <div className="flex justify-between items-center mb-5">
                     <h3 className="text-lg font-bold text-gray-900 font-['Inter']">Revenue</h3>
                     <select className="text-xs bg-gray-50 border border-gray-200 rounded-lg px-3 py-1.5 text-gray-500 cursor-pointer outline-none focus:border-[#14B8A6] transition-colors">
-                      <option>NÄƒm 2025</option>
-                      <option>NÄƒm 2024</option>
+                      <option>Year 2025</option>
+                      <option>Year 2024</option>
                     </select>
                   </div>
+
                   <div className="h-64">
                     <Line
                       data={{
                         labels: CHART_LABELS,
                         datasets: [
                           {
-                            label: "Revenue (Tá»·)",
+                            label: "Revenue (Billion VND)",
                             data: CHART_DATA.revenue,
                             borderColor: "#14B8A6",
                             backgroundColor: "rgba(20, 184, 166, 0.12)",
@@ -493,26 +829,26 @@ const Profile = () => {
                           legend: { display: false },
                           tooltip: {
                             backgroundColor: "#1F2937",
-                            titleFont: { family: "Josefin Sans", size: 13 },
-                            bodyFont: { family: "Josefin Sans", size: 12 },
+                            titleFont: { family: "Inter", size: 13 },
+                            bodyFont: { family: "Inter", size: 12 },
                             padding: 12,
                             cornerRadius: 10,
                             callbacks: {
-                              label: (ctx) => ` Revenue: ${ctx.parsed.y} Tá»· VNÄ`,
+                              label: (context) => ` Revenue: ${context.parsed.y} Billion VND`,
                             },
                           },
                         },
                         scales: {
                           x: {
                             grid: { display: false },
-                            ticks: { font: { family: "Josefin Sans", size: 11 }, color: "#9CA3AF" },
+                            ticks: { font: { family: "Inter", size: 11 }, color: "#9CA3AF" },
                           },
                           y: {
                             grid: { color: "#F3F4F6" },
                             ticks: {
-                              font: { family: "Josefin Sans", size: 11 },
+                              font: { family: "Inter", size: 11 },
                               color: "#9CA3AF",
-                              callback: (v) => `${v} Tá»·`,
+                              callback: (value) => `${value}B`,
                             },
                           },
                         },
@@ -525,42 +861,55 @@ const Profile = () => {
                   <div className="flex justify-between items-center mb-5">
                     <h3 className="text-lg font-bold text-gray-900 font-['Inter']">Latest Activity</h3>
                     <button
-                      onClick={() => setActivityVisible(!activityVisible)}
+                      onClick={handleToggleActivityVisibility}
                       className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold border transition-colors cursor-pointer ${
                         activityVisible
                           ? "bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100"
                           : "bg-gray-50 text-gray-400 border-gray-200 hover:bg-gray-100"
                       }`}
-                      title={activityVisible ? "Äang hiá»‡n cho ngÆ°á»i khÃ¡c" : "Äang áº©n vá»›i ngÆ°á»i khÃ¡c"}
+                      title={activityVisible ? "Visible to others" : "Hidden from others"}
                     >
                       {activityVisible ? <Eye className="w-3.5 h-3.5" /> : <EyeOff className="w-3.5 h-3.5" />}
-                      {activityVisible ? "CÃ´ng khai" : "ÄÃ£ áº©n"}
+                      {activityVisible ? "Public" : "Hidden"}
                     </button>
                   </div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {[
-                      { label: "Urgent", title: "Meeting with buyer for Biá»‡t thá»± ven sÃ´ng", time: "27 Feb, 2:30 PM â€“ 4:00 PM", color: "bg-red-500" },
-                      { label: "Reminder", title: "Update pricing for Penthouse Landmark 81", time: "26 Feb, 9:00 AM", color: "bg-blue-500" },
-                    ].map((act, i) => (
-                      <div key={i} className="border border-gray-100 rounded-xl p-4 hover:border-[#14B8A6]/30 hover:shadow-sm transition-all cursor-pointer group">
-                        <div className="flex items-center gap-2 mb-2">
-                          <span className={`w-2 h-2 rounded-full ${act.color}`} />
-                          <span className="text-xs font-bold text-red-600">{act.label}</span>
+
+                  {latestActivities.length > 0 ? (
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {latestActivities.map((activity) => (
+                        <div
+                          key={activity.id}
+                          className="border border-gray-100 rounded-xl p-4 hover:border-[#14B8A6]/30 hover:shadow-sm transition-all cursor-pointer group"
+                        >
+                          <div className="flex items-center gap-2 mb-2">
+                            <span className="w-2 h-2 rounded-full bg-emerald-500" />
+                            <span className="text-xs font-bold text-emerald-600">{activity.listingTypeLabel}</span>
+                          </div>
+                          <h4 className="text-sm font-semibold text-gray-800 mb-3 group-hover:text-[#0F766E] transition-colors">
+                            {activity.title}
+                          </h4>
+                          <div className="flex items-start gap-1.5 text-xs text-gray-400 mb-3">
+                            <MapPin className="w-3 h-3 mt-0.5 flex-shrink-0" />
+                            <span>{activity.address}</span>
+                          </div>
+                          <div className="flex items-center gap-2 text-xs text-gray-400">
+                            <Avatar className="w-5 h-5">
+                              <AvatarImage src={user?.avatar ?? undefined} alt={displayName} />
+                              <AvatarFallback>{displayInitials}</AvatarFallback>
+                            </Avatar>
+                            {displayName}
+                          </div>
+                          <div className="flex items-center gap-1 text-xs text-gray-400 mt-1.5">
+                            <Clock className="w-3 h-3" /> {new Date(activity.createdAt).toLocaleString()}
+                          </div>
                         </div>
-                        <h4 className="text-sm font-semibold text-gray-800 mb-3 group-hover:text-[#0F766E] transition-colors">{act.title}</h4>
-                        <div className="flex items-center gap-2 text-xs text-gray-400">
-                          <Avatar className="w-5 h-5">
-                            <AvatarImage src={user?.avatar ?? undefined} />
-                            <AvatarFallback>{displayName.slice(0,2).toUpperCase()}</AvatarFallback>
-                          </Avatar>
-                          {displayName}
-                        </div>
-                        <div className="flex items-center gap-1 text-xs text-gray-400 mt-1.5">
-                          <Clock className="w-3 h-3" /> {act.time}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="rounded-xl border border-dashed border-gray-200 px-5 py-12 text-center">
+                      <p className="text-sm font-medium text-gray-500">No recent activity yet.</p>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
@@ -571,49 +920,78 @@ const Profile = () => {
               <div className="flex justify-between items-center">
                 <div>
                   <h2 className="text-2xl font-bold text-gray-900 font-['Inter']">Viewing Appointments</h2>
-                  <p className="text-sm text-gray-400 mt-1">Properties you are interested in & scheduled</p>
+                  <p className="text-sm text-gray-400 mt-1">Properties you are interested in and scheduled to visit</p>
                 </div>
               </div>
 
               <div className="grid grid-cols-1 gap-4">
                 {loadingAppointments ? (
-                    <div className="py-10 text-center text-gray-500">Äang táº£i dá»¯ liá»‡u...</div>
+                  <div className="py-10 text-center text-gray-500">Loading appointments...</div>
+                ) : displayBuyList.length === 0 ? (
+                  <div className="bg-white rounded-2xl border border-dashed border-gray-200 p-10 text-center">
+                    <h3 className="text-lg font-semibold text-gray-900">No viewing appointments yet</h3>
+                    <p className="text-sm text-gray-500 mt-2">
+                      When you book a property viewing, it will appear here automatically.
+                    </p>
+                  </div>
                 ) : (
-                  paginatedBuy.map((apt) => (
-                    <div key={apt.id} className="bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all p-5 flex flex-col md:flex-row items-center gap-5 cursor-pointer group">
-                    <img src={apt.image} alt={apt.property} className="w-full md:w-28 h-28 rounded-xl object-cover flex-shrink-0 group-hover:scale-[1.02] transition-transform" />
-                    <div className="flex-1 min-w-0">
-                      <h4 className="text-lg font-bold text-gray-900 group-hover:text-[#0F766E] transition-colors truncate">{apt.property}</h4>
-                      <p className="text-sm text-gray-400 mt-1">Meeting with: <span className="font-semibold text-gray-600">{apt.seller}</span></p>
-                      <div className="text-xl font-bold text-[#0F766E] font-['Inter'] mt-2">{apt.price}</div>
-                    </div>
-                    <div className="flex items-center gap-3 bg-[#F8FAFB] px-4 py-3 rounded-xl border border-gray-100 flex-shrink-0">
-                      <Calendar className="w-5 h-5 text-[#14B8A6]" />
-                      <div>
-                        <div className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Time</div>
-                        <div className="text-sm font-semibold text-gray-700">{apt.date}</div>
+                  paginatedBuy.map((appointment) => (
+                    <div
+                      key={appointment.id}
+                      className="bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all p-5 flex flex-col md:flex-row items-center gap-5 cursor-pointer group"
+                    >
+                      <img
+                        src={appointment.image}
+                        alt={appointment.property}
+                        className="w-full md:w-28 h-28 rounded-xl object-cover flex-shrink-0 group-hover:scale-[1.02] transition-transform"
+                      />
+
+                      <div className="flex-1 min-w-0">
+                        <h4 className="text-lg font-bold text-gray-900 group-hover:text-[#0F766E] transition-colors truncate">
+                          {appointment.property}
+                        </h4>
+                        <p className="text-sm text-gray-400 mt-1">
+                          Meeting with: <span className="font-semibold text-gray-600">{appointment.seller}</span>
+                        </p>
+                        <div className="text-xl font-bold text-[#0F766E] font-['Inter'] mt-2">{appointment.price}</div>
+                      </div>
+
+                      <div className="flex items-center gap-3 bg-[#F8FAFB] px-4 py-3 rounded-xl border border-gray-100 flex-shrink-0">
+                        <Calendar className="w-5 h-5 text-[#14B8A6]" />
+                        <div>
+                          <div className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Time</div>
+                          <div className="text-sm font-semibold text-gray-700">{appointment.date}</div>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-4 flex-shrink-0">
+                        <span
+                          className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold border ${statusColor(appointment.status)}`}
+                        >
+                          {appointment.status === "Confirmed" ? (
+                            <CheckCircle2 className="w-3 h-3" />
+                          ) : (
+                            <Clock className="w-3 h-3" />
+                          )}
+                          {appointment.status}
+                        </span>
+
+                        <Link to={`/appointment/${appointment.id}`}>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="rounded-full border-gray-200 text-gray-600 hover:border-[#14B8A6] hover:text-[#0F766E] cursor-pointer"
+                          >
+                            Details <ArrowRight className="w-3 h-3 ml-1" />
+                          </Button>
+                        </Link>
                       </div>
                     </div>
-                    <div className="flex items-center gap-4 flex-shrink-0">
-                      <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold border ${statusColor(apt.status)}`}>
-                        {apt.status === "Confirmed" ? <CheckCircle2 className="w-3 h-3" /> : <Clock className="w-3 h-3" />}
-                        {apt.status}
-                      </span>
-                      <Link to={`/appointment/${apt.id}`}>
-                        <Button variant="outline" size="sm" className="rounded-full border-gray-200 text-gray-600 hover:border-[#14B8A6] hover:text-[#0F766E] cursor-pointer">
-                          Details <ArrowRight className="w-3 h-3 ml-1" />
-                        </Button>
-                      </Link>
-                    </div>
-                  </div>
-                )))}
+                  ))
+                )}
               </div>
-              
-              <PaginationControls 
-                currentPage={buyPage} 
-                totalPages={totalBuyPages} 
-                onPageChange={setBuyPage} 
-              />
+
+              <PaginationControls currentPage={buyPage} totalPages={totalBuyPages} onPageChange={setBuyPage} />
             </div>
           )}
 
@@ -624,9 +1002,9 @@ const Profile = () => {
                   <h2 className="text-2xl font-bold text-gray-900 font-['Inter']">Properties for Sale</h2>
                   <p className="text-sm text-gray-400 mt-1">Manage your active property listings</p>
                 </div>
-                <Button 
+                <Button
                   className="bg-[#0369A1] hover:bg-[#0369A1]/90 text-white rounded-full px-6 cursor-pointer"
-                  onClick={() => navigate('/add-property')}
+                  onClick={() => navigate("/add-property")}
                 >
                   + Add Property
                 </Button>
@@ -640,7 +1018,7 @@ const Profile = () => {
                   <p className="text-sm text-gray-500 mt-2">Add your first property to start receiving buyer requests.</p>
                   <Button
                     className="mt-4 bg-[#0369A1] hover:bg-[#0369A1]/90 text-white rounded-full px-6 cursor-pointer"
-                    onClick={() => navigate('/add-property')}
+                    onClick={() => navigate("/add-property")}
                   >
                     + Add Property
                   </Button>
@@ -649,14 +1027,22 @@ const Profile = () => {
                 <>
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {paginatedSell.map((item) => (
-                      <div key={item.id} onClick={() => navigate('/manage-property/' + item.id)} className="bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-lg transition-all overflow-hidden cursor-pointer group">
+                      <div
+                        key={item.id}
+                        onClick={() => navigate(`/manage-property/${item.id}`)}
+                        className="bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-lg transition-all overflow-hidden cursor-pointer group"
+                      >
                         <div className="relative h-48 overflow-hidden">
-                          <img src={item.image} alt={item.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                          <img
+                            src={item.image}
+                            alt={item.title}
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                          />
                           {item.newAppointments > 0 && (
                             <div className="absolute top-3 right-3 bg-rose-500 text-white text-xs font-bold px-2 rounded flex items-center gap-1 shadow-md animate-pulse">
                               <span className="relative flex h-2 w-2 mr-1">
-                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
-                                <span className="relative inline-flex rounded-full h-2 w-2 bg-white"></span>
+                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75" />
+                                <span className="relative inline-flex rounded-full h-2 w-2 bg-white" />
                               </span>
                               {item.newAppointments} New Appointments
                             </div>
@@ -665,8 +1051,11 @@ const Profile = () => {
                             {item.daysListed} days
                           </div>
                         </div>
+
                         <div className="p-5">
-                          <h4 className="text-lg font-bold text-gray-900 group-hover:text-[#0F766E] transition-colors truncate">{item.title}</h4>
+                          <h4 className="text-lg font-bold text-gray-900 group-hover:text-[#0F766E] transition-colors truncate">
+                            {item.title}
+                          </h4>
                           <div className="flex items-start gap-1.5 text-gray-400 text-xs mt-1.5">
                             <MapPin className="w-3 h-3 flex-shrink-0 mt-0.5" />
                             <span>{item.address}</span>
@@ -677,20 +1066,26 @@ const Profile = () => {
                     ))}
                   </div>
 
-                  <PaginationControls
-                    currentPage={sellPage}
-                    totalPages={totalSellPages}
-                    onPageChange={setSellPage}
-                  />
+                  <PaginationControls currentPage={sellPage} totalPages={totalSellPages} onPageChange={setSellPage} />
                 </>
               )}
             </div>
           )}
-
         </div>
       </main>
 
       <Footer />
+
+      {!user?.is_staff && !user?.agent_is_verified && (
+        <VerificationRequestModal
+          isOpen={verificationRequestOpen}
+          onClose={() => setVerificationRequestOpen(false)}
+          onSubmit={handleVerificationSubmit}
+          initialFullName={displayName}
+          initialAddress={infoData.location}
+          submitting={submittingVerification}
+        />
+      )}
 
       <style>{`
         @keyframes fadeIn {
@@ -703,4 +1098,3 @@ const Profile = () => {
 };
 
 export default Profile;
-

@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import ProtectedRoute from "@/components/ProtectedRoute";
+import AdminRoute from "@/components/AdminRoute";
 import Index from "./pages/Index";
 import Listings from "./pages/Listings";
 import Login from "./pages/Login";
@@ -21,6 +22,9 @@ import AddProperty from "./pages/AddProperty";
 import News from "./pages/News";
 import PropertyDetail from "./pages/PropertyDetail";
 import PricePrediction from "./pages/PricePrediction";
+import Agents from "./pages/Agents";
+import AgentDetail from "./pages/AgentDetail";
+import AdminDashboard from "./pages/AdminDashboard";
 
 const queryClient = new QueryClient();
 
@@ -37,6 +41,8 @@ const App = () => (
             <Route path="/news" element={<News />} />
             <Route path="/prediction" element={<PricePrediction />} />
             <Route path="/listings" element={<Listings />} />
+            <Route path="/agents" element={<Agents />} />
+            <Route path="/agents/:slug" element={<AgentDetail />} />
             <Route path="/explore" element={<Explore />} />
             <Route path="/property/:id" element={<PropertyDetail />} />
             <Route path="/login" element={<Login />} />
@@ -48,8 +54,9 @@ const App = () => (
             <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
             <Route path="/your-info" element={<ProtectedRoute><ChangePassword /></ProtectedRoute>} />
             <Route path="/appointment/:id" element={<ProtectedRoute><AppointmentDetail /></ProtectedRoute>} />
-            <Route path="/manage-property/:id" element={<ProtectedRoute><ManageProperty /></ProtectedRoute>} />
-            <Route path="/add-property" element={<ProtectedRoute><AddProperty /></ProtectedRoute>} />
+            <Route path="/manage-property/:id" element={<ProtectedRoute requireVerifiedSeller><ManageProperty /></ProtectedRoute>} />
+            <Route path="/add-property" element={<ProtectedRoute requireVerifiedSeller><AddProperty /></ProtectedRoute>} />
+            <Route path="/admin-dashboard" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
 
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
