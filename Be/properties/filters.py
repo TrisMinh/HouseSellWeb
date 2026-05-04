@@ -2,13 +2,9 @@ import django_filters
 from .models import Property, PropertyType, ListingType, PropertyStatus
 
 
-class CharInFilter(django_filters.BaseInFilter, django_filters.CharFilter):
-    pass
-
-
 class PropertyFilter(django_filters.FilterSet):
     # Lọc theo loại BĐS và hình thức
-    property_type = CharInFilter(field_name='property_type', lookup_expr='in')
+    property_type = django_filters.ChoiceFilter(choices=PropertyType.choices)
     listing_type  = django_filters.ChoiceFilter(choices=ListingType.choices)
     status        = django_filters.ChoiceFilter(choices=PropertyStatus.choices)
 

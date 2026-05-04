@@ -226,7 +226,7 @@ const Profile = () => {
       setLoadingSellListings(true);
       try {
         const [response, ownerAppointmentsResponse] = await Promise.all([
-          getMyProperties({ page_size: 100 }),
+          getMyProperties(),
           getOwnerAppointments(),
         ]);
         const properties = normalizeListResponse(response);
