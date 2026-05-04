@@ -32,7 +32,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { createAppointment } from '@/lib/appointmentsApi';
-import { getImageUrl, getProperty, Property, toggleFavorite } from '@/lib/propertiesApi';
+import { deleteProperty, getImageUrl, getProperty, Property, toggleFavorite } from '@/lib/propertiesApi';
 
 const FALLBACK_IMAGE =
   'https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=1200&auto=format&fit=crop';
@@ -103,6 +103,7 @@ const PropertyDetail = () => {
   const [bookingError, setBookingError] = useState('');
   const [bookingLoading, setBookingLoading] = useState(false);
   const [favoriteLoading, setFavoriteLoading] = useState(false);
+  const [deleteLoading, setDeleteLoading] = useState(false);
 
   useLayoutEffect(() => {
     window.scrollTo({ top: 0, left: 0, behavior: 'instant' as ScrollBehavior });
@@ -230,6 +231,21 @@ const PropertyDetail = () => {
       return;
     }
     setIsScheduleModalOpen(true);
+  };
+
+  const handleDeleteProperty = async () => {
+    if (!property || !user?.is_staff) return;
+    if (!window.confirm(`Delete "${property.title}" permanently?`)) return;
+
+    try {
+      setDeleteLoading(true);
+      setBookingError('');
+      await deleteProperty(property.id);
+      navigate('/listings', { replace: true });
+    } catch {
+      setBookingError('Cannot delete this property right now.');
+      setDeleteLoading(false);
+    }
   };
 
   const handleSchedule = async (date: Date, isCustom: boolean, selectedTime?: string) => {
@@ -622,6 +638,16 @@ const PropertyDetail = () => {
                       <CalendarCheck className="w-5 h-5 mr-2" />
                       {bookingLoading ? 'Booking...' : 'Book Appointment'}
                     </Button>
+                    {user?.is_staff && (
+                      <Button
+                        variant="destructive"
+                        className="w-full h-12 text-base font-bold rounded-xl cursor-pointer"
+                        disabled={deleteLoading}
+                        onClick={handleDeleteProperty}
+                      >
+                        {deleteLoading ? 'Deleting...' : 'Delete Property'}
+                      </Button>
+                    )}
                   </div>
                 </div>
               </div>

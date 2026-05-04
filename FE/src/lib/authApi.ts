@@ -20,6 +20,18 @@ export interface ChangePasswordPayload {
   new_password_confirm: string;
 }
 
+export interface ForgotPasswordRequestPayload {
+  username: string;
+  email: string;
+}
+
+export interface ResetPasswordConfirmPayload {
+  uid: string;
+  token: string;
+  new_password: string;
+  new_password_confirm: string;
+}
+
 export interface LoginUser {
   id: number;
   username: string;
@@ -114,6 +126,23 @@ export const updateProfile = async (payload: FormData | UpdateProfilePayload) =>
 export const changePassword = async (payload: ChangePasswordPayload) => {
   const { data } = await api.post("/api/auth/users/change-password/", payload);
   return data;
+};
+
+export const requestPasswordReset = async (payload: ForgotPasswordRequestPayload) => {
+  const { data } = await api.post("/api/auth/password-reset/request/", payload);
+  return data as { message: string };
+};
+
+export const validatePasswordResetToken = async (uid: string, token: string) => {
+  const { data } = await api.get("/api/auth/password-reset/validate/", {
+    params: { uid, token },
+  });
+  return data as { valid: boolean };
+};
+
+export const confirmPasswordReset = async (payload: ResetPasswordConfirmPayload) => {
+  const { data } = await api.post("/api/auth/password-reset/confirm/", payload);
+  return data as { message: string };
 };
 
 export const isAuthenticated = (): boolean => {

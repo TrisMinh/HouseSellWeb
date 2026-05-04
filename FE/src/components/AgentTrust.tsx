@@ -68,8 +68,7 @@ export const AgentTrust = () => {
         <motion.div
           className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12"
           initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: "-100px" }}
+          animate="visible"
           variants={{
             hidden: { opacity: 0 },
             visible: {
@@ -78,56 +77,62 @@ export const AgentTrust = () => {
             },
           }}
         >
-          {agents.map((agent) => (
-            <motion.div
-              key={agent.id}
-              variants={{
-                hidden: { opacity: 0, y: 20 },
-                visible: { opacity: 1, y: 0 },
-              }}
-            >
-              <Link
-                to={`/agents/${agent.slug}`}
-                className="card-elevated card-hover p-5 text-center cursor-pointer group block h-full"
+          {agents.length > 0 ? (
+            agents.map((agent) => (
+              <motion.div
+                key={agent.id}
+                variants={{
+                  hidden: { opacity: 0, y: 20 },
+                  visible: { opacity: 1, y: 0 },
+                }}
               >
-                <div className="relative w-20 h-20 mx-auto mb-4">
-                  <Avatar className="w-full h-full">
-                    <AvatarImage src={agent.avatar_url || undefined} alt={agent.full_name} className="object-cover" />
-                    <AvatarFallback className="bg-sky-50 text-sky-700 text-lg font-semibold">
-                      {getAgentInitials(agent.full_name)}
-                    </AvatarFallback>
-                  </Avatar>
-                  {agent.is_verified && (
-                    <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-accent rounded-full flex items-center justify-center">
-                      <svg className="w-3.5 h-3.5 text-white" fill="currentColor" viewBox="0 0 20 20">
-                        <path
-                          fillRule="evenodd"
-                          d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                          clipRule="evenodd"
-                        />
-                      </svg>
-                    </div>
-                  )}
-                </div>
+                <Link
+                  to={`/agents/${agent.slug}`}
+                  className="card-elevated card-hover p-5 text-center cursor-pointer group block h-full"
+                >
+                  <div className="relative w-20 h-20 mx-auto mb-4">
+                    <Avatar className="w-full h-full">
+                      <AvatarImage src={agent.avatar_url || undefined} alt={agent.full_name} className="object-cover" />
+                      <AvatarFallback className="bg-sky-50 text-sky-700 text-lg font-semibold">
+                        {getAgentInitials(agent.full_name)}
+                      </AvatarFallback>
+                    </Avatar>
+                    {agent.is_verified && (
+                      <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-accent rounded-full flex items-center justify-center">
+                        <svg className="w-3.5 h-3.5 text-white" fill="currentColor" viewBox="0 0 20 20">
+                          <path
+                            fillRule="evenodd"
+                            d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                            clipRule="evenodd"
+                          />
+                        </svg>
+                      </div>
+                    )}
+                  </div>
 
-                <h3 className="font-semibold text-primary mb-1 group-hover:text-accent transition-colors">
-                  {agent.full_name}
-                </h3>
-                <p className="text-sm text-muted-foreground mb-3 line-clamp-2">{agent.specialization || agent.tagline}</p>
+                  <h3 className="font-semibold text-primary mb-1 group-hover:text-accent transition-colors">
+                    {agent.full_name}
+                  </h3>
+                  <p className="text-sm text-muted-foreground mb-3 line-clamp-2">{agent.specialization || agent.tagline}</p>
 
-                <div className="flex items-center justify-center gap-1 mb-3">
-                  <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
-                  <span className="font-medium text-foreground">{agent.rating}</span>
-                  <span className="text-muted-foreground text-sm">({agent.total_reviews})</span>
-                </div>
+                  <div className="flex items-center justify-center gap-1 mb-3">
+                    <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
+                    <span className="font-medium text-foreground">{agent.rating}</span>
+                    <span className="text-muted-foreground text-sm">({agent.total_reviews})</span>
+                  </div>
 
-                <div className="flex items-center justify-center gap-1 text-sm text-muted-foreground">
-                  <MapPin className="w-4 h-4" />
-                  <span className="line-clamp-1">{agent.areas.join(", ")}</span>
-                </div>
-              </Link>
-            </motion.div>
-          ))}
+                  <div className="flex items-center justify-center gap-1 text-sm text-muted-foreground">
+                    <MapPin className="w-4 h-4" />
+                    <span className="line-clamp-1">{agent.areas.join(", ")}</span>
+                  </div>
+                </Link>
+              </motion.div>
+            ))
+          ) : (
+            <div className="sm:col-span-2 lg:col-span-4 card-elevated p-8 text-center text-muted-foreground">
+              No verified agents are available right now.
+            </div>
+          )}
         </motion.div>
 
         <motion.div
@@ -155,4 +160,3 @@ export const AgentTrust = () => {
     </section>
   );
 };
-

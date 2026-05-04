@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 
 import os
 from pathlib import Path
+from urllib.parse import unquote, urlparse
 from django.core.exceptions import ImproperlyConfigured
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -108,27 +109,103 @@ WSGI_APPLICATION = 'core.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
-_db_engine = os.getenv('HSW_DB_ENGINE', os.getenv('DB_ENGINE', 'django.db.backends.mysql')).strip()
+def _parse_database_url(database_url: str) -> dict:
+    parsed = urlparse(database_url)
+    engine_map = {
+        'postgres': 'django.db.backends.postgresql',
+        'postgresql': 'django.db.backends.postgresql',
+        'pgsql': 'django.db.backends.postgresql',
+        'mysql': 'django.db.backends.mysql',
+        'sqlite': 'django.db.backends.sqlite3',
+    }
 
-if _db_engine == 'django.db.backends.sqlite3':
-    DATABASES = {
-        'default': {
-            'ENGINE': _db_engine,
-            'NAME': os.getenv('HSW_DB_NAME', str(BASE_DIR / 'db.sqlite3')),
+    if parsed.scheme not in engine_map:
+        raise ImproperlyConfigured(
+            f"Unsupported database URL scheme: {parsed.scheme}"
+        )
+
+    engine = engine_map[parsed.scheme]
+
+    if engine == 'django.db.backends.sqlite3':
+        return {
+            'ENGINE': engine,
+            'NAME': unquote(parsed.path.lstrip('/')) or str(BASE_DIR / 'db.sqlite3'),
         }
+
+    config = {
+        'ENGINE': engine,
+        'NAME': unquote(parsed.path.lstrip('/')),
+        'USER': unquote(parsed.username or ''),
+        'PASSWORD': unquote(parsed.password or ''),
+        'HOST': parsed.hostname or '',
+        'PORT': str(parsed.port or ('5432' if engine == 'django.db.backends.postgresql' else '3306')),
+    }
+
+    if engine == 'django.db.backends.postgresql':
+        _pg_options = {
+            'sslmode': os.getenv('HSW_DB_SSLMODE', 'require'),
+        }
+        _pg_search_path = os.getenv('HSW_DB_SEARCH_PATH', '').strip()
+        if _pg_search_path:
+            _pg_options['options'] = f"-c search_path={_pg_search_path}"
+        config['OPTIONS'] = _pg_options
+
+    return config
+
+
+_database_url = os.getenv('HSW_DATABASE_URL', os.getenv('DATABASE_URL', '')).strip()
+
+if _database_url:
+    DATABASES = {
+        'default': _parse_database_url(_database_url),
     }
 else:
-    DATABASES = {
-        'default': {
-            'ENGINE': _db_engine,
-            'NAME': os.getenv('HSW_DB_NAME', os.getenv('DB_NAME', 'housesell_db')),
-            # Use project-scoped vars first to avoid collisions with global OS vars.
-            'USER': os.getenv('HSW_DB_USER', 'root'),
-            'PASSWORD': os.getenv('HSW_DB_PASSWORD', ''),
-            'HOST': os.getenv('HSW_DB_HOST', 'localhost'),
-            'PORT': os.getenv('HSW_DB_PORT', '3306'),
+    _db_engine = os.getenv('HSW_DB_ENGINE', os.getenv('DB_ENGINE', 'django.db.backends.mysql')).strip()
+
+    if _db_engine == 'django.db.backends.sqlite3':
+        DATABASES = {
+            'default': {
+                'ENGINE': _db_engine,
+                'NAME': os.getenv('HSW_DB_NAME', str(BASE_DIR / 'db.sqlite3')),
+            }
         }
-    }
+    else:
+        _db_defaults = {
+            'django.db.backends.postgresql': {
+                'NAME': 'postgres',
+                'USER': 'postgres',
+                'HOST': 'localhost',
+                'PORT': '5432',
+            },
+            'django.db.backends.mysql': {
+                'NAME': 'housesell_db',
+                'USER': 'root',
+                'HOST': 'localhost',
+                'PORT': '3306',
+            },
+        }
+        _selected_defaults = _db_defaults.get(_db_engine, _db_defaults['django.db.backends.mysql'])
+
+        DATABASES = {
+            'default': {
+                'ENGINE': _db_engine,
+                'NAME': os.getenv('HSW_DB_NAME', os.getenv('DB_NAME', _selected_defaults['NAME'])),
+                # Use project-scoped vars first to avoid collisions with global OS vars.
+                'USER': os.getenv('HSW_DB_USER', _selected_defaults['USER']),
+                'PASSWORD': os.getenv('HSW_DB_PASSWORD', ''),
+                'HOST': os.getenv('HSW_DB_HOST', _selected_defaults['HOST']),
+                'PORT': os.getenv('HSW_DB_PORT', _selected_defaults['PORT']),
+            }
+        }
+
+        if _db_engine == 'django.db.backends.postgresql':
+            _pg_options = {
+                'sslmode': os.getenv('HSW_DB_SSLMODE', 'require'),
+            }
+            _pg_search_path = os.getenv('HSW_DB_SEARCH_PATH', '').strip()
+            if _pg_search_path:
+                _pg_options['options'] = f"-c search_path={_pg_search_path}"
+            DATABASES['default']['OPTIONS'] = _pg_options
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
@@ -166,6 +243,8 @@ TIME_ZONE = 'UTC'
 USE_I18N = True
 
 USE_TZ = True
+
+PASSWORD_RESET_TIMEOUT = int(os.getenv('PASSWORD_RESET_TIMEOUT', '1800'))
 
 
 # Static files (CSS, JavaScript, Images)
@@ -211,6 +290,23 @@ if DEBUG:
         r"^http://172\.(1[6-9]|2\d|3[0-1])\.\d+\.\d+:(3000|4173|5173|8080)$",
     ])
 
+FRONTEND_BASE_URL = os.getenv(
+    'FRONTEND_BASE_URL',
+    CORS_ALLOWED_ORIGINS[0] if CORS_ALLOWED_ORIGINS else 'http://localhost:8080'
+).rstrip('/')
+
+EMAIL_BACKEND = os.getenv(
+    'EMAIL_BACKEND',
+    'django.core.mail.backends.console.EmailBackend' if DEBUG else 'django.core.mail.backends.smtp.EmailBackend',
+)
+EMAIL_HOST = os.getenv('EMAIL_HOST', '')
+EMAIL_PORT = int(os.getenv('EMAIL_PORT', '587'))
+EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER', '')
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD', '')
+EMAIL_USE_TLS = os.getenv('EMAIL_USE_TLS', 'True').lower() in ('1', 'true', 'yes')
+EMAIL_USE_SSL = os.getenv('EMAIL_USE_SSL', 'False').lower() in ('1', 'true', 'yes')
+DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', EMAIL_HOST_USER or 'no-reply@bluesky.local')
+
 SWAGGER_PUBLIC = os.getenv('SWAGGER_PUBLIC', 'true' if DEBUG else 'false').lower() in ('1', 'true', 'yes')
 
 # JWT
@@ -224,6 +320,14 @@ SIMPLE_JWT = {
 # Media files (ảnh upload)
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
+
+SUPABASE_URL = os.getenv('SUPABASE_URL', '').strip()
+SUPABASE_SERVICE_ROLE_KEY = os.getenv('SUPABASE_SERVICE_ROLE_KEY', '').strip()
+SUPABASE_AVATARS_BUCKET = os.getenv('SUPABASE_AVATARS_BUCKET', 'avatars').strip() or 'avatars'
+SUPABASE_PROPERTY_IMAGES_BUCKET = os.getenv('SUPABASE_PROPERTY_IMAGES_BUCKET', 'property-images').strip() or 'property-images'
+SUPABASE_VERIFICATION_DOCS_BUCKET = os.getenv('SUPABASE_VERIFICATION_DOCS_BUCKET', 'verification-docs').strip() or 'verification-docs'
+SUPABASE_NEWS_BUCKET = os.getenv('SUPABASE_NEWS_BUCKET', SUPABASE_PROPERTY_IMAGES_BUCKET).strip() or SUPABASE_PROPERTY_IMAGES_BUCKET
+SUPABASE_SIGNED_URL_EXPIRES_IN = int(os.getenv('SUPABASE_SIGNED_URL_EXPIRES_IN', '3600'))
 
 # Property media upload policy (V8)
 _property_image_allowed_types = os.getenv(
